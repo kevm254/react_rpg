@@ -1,0 +1,13 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background-color: black;
+}
+
+.App {
+  font-family: sans-serif;
+  text-align: center;
+}
