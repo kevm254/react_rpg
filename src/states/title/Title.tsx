@@ -99,35 +99,43 @@ export default class Title extends Component<TitleProps, TitleState> {
 
   render() {
     return (
-      <div className="App" style={this.titleStyles.get(StylesKey.CONTAINER)}>
-        <h1 ref={this.logoRef} style={this.titleStyles.get(StylesKey.LOGO)}>
-          Visions of the Apocalypse
-        </h1>
+      <Animate animType="FADE_IN">
+        <div className="App" style={this.titleStyles.get(StylesKey.CONTAINER)}>
+          <h1 ref={this.logoRef} style={this.titleStyles.get(StylesKey.LOGO)}>
+            <Animate>
+              <span>Visions of the</span>
+            </Animate>
 
-        <div
-          className="menu_options"
-          style={this.titleStyles.get(StylesKey.MENU_OPTIONS)}
-        >
-          <p
-            style={Object.assign(
-              {},
-              { border: "2px solid #221122" },
-              this.isSelected(0)
-            )}
+            <Animate animType="SLIDE_FROM_RIGHT">
+              <span>Apocalypse</span>
+            </Animate>
+          </h1>
+
+          <div
+            className="menu_options"
+            style={this.titleStyles.get(StylesKey.MENU_OPTIONS)}
           >
-            Start
-          </p>
-          <p
-            style={Object.assign(
-              {},
-              { border: "2px solid #221122" },
-              this.isSelected(1)
-            )}
-          >
-            Options
-          </p>
+            <p
+              style={Object.assign(
+                {},
+                { border: "2px solid #221122" },
+                this.isSelected(0)
+              )}
+            >
+              Start
+            </p>
+            <p
+              style={Object.assign(
+                {},
+                { border: "2px solid #221122" },
+                this.isSelected(1)
+              )}
+            >
+              Options
+            </p>
+          </div>
         </div>
-      </div>
+      </Animate>
     );
   }
 }

@@ -42,6 +42,10 @@ export default class GameContainer extends Component {
   }
 
   render() {
-    return <div>{this.getGameState(this.state.currentState)}</div>;
+    return (
+      <div style={{ height: 400, width: 800 }}>
+        {this.getGameState(this.state.currentState)}
+      </div>
+    );
   }
 }

@@ -7,7 +7,7 @@ export default class TextBox extends Component {
 
   startText: string = "You are at the starting position";
   defaultText: string = `You wake up in the remains of a once beautiful, but now ruined city.
-       Flames lick up all around you, devouring the remains of houses and cars. 
+       Flames swirl all around you, devouring the remains of houses and cars. 
        In the midst of the chaos, you take a small minute to ponder how or why
        you survived. You see a stranger approaching...`;
 
@@ -52,6 +52,7 @@ export default class TextBox extends Component {
           height: "250px",
           border: "2px solid white",
           color: "white",
+          backgroundColor: "blue",
           position: "relative"
         }}
       >

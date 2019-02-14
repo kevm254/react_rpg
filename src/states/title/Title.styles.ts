@@ -33,10 +33,7 @@ export default class TitleStyles {
     return {
       backgroundColor: "#221122",
       margin: "auto",
-      color: "white",
-      height: "80vh",
-      overflow: "hidden",
-      width: "100%"
+      color: "white"
     };
   }
 
