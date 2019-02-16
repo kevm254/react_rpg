@@ -1,9 +1,9 @@
 import React, { Component } from "react";
-import TitleStyles, { StylesKey } from "./Title.styles";
+import TitleStyles from "./Title.styles";
 import * as anime from "animejs";
 import { Keys } from "../../Models/Keys.model";
-import Animate from "../../components/Animate/Animate.component";
-import AnimateSequencer from "../../components/Animate/AnimateSequencer.component";
+import Anim from "../../components/Anim/Anim.component";
+import AnimateSequencer from "../../components/Anim/AnimSequencer.component";
 
 interface TitleProps {
   events: {
@@ -98,47 +98,66 @@ export default class Title extends Component<TitleProps, TitleState> {
     }
   }
 
+  renderTitle() {
+    return (
+      <h1 ref={this.logoRef} style={TitleStyles.getLogoStyles()}>
+        <AnimateSequencer>
+          <Anim>
+            <span>Visions of the</span>
+          </Anim>
+
+          <Anim animType="SLIDE_FROM_RIGHT">
+            <span>Apocalypse</span>
+          </Anim>
+        </AnimateSequencer>
+      </h1>
+    );
+  }
+
+  renderMenu() {
+    return (
+      <div className="menu_options" style={TitleStyles.getMenuOptionsStyles()}>
+        <p
+          style={Object.assign(
+            {},
+            { border: "2px solid #221122" },
+            this.isSelected(0)
+          )}
+        >
+          Start
+        </p>
+        <p
+          style={Object.assign(
+            {},
+            { border: "2px solid #221122" },
+            this.isSelected(1)
+          )}
+        >
+          Options
+        </p>
+      </div>
+    );
+  }
+
+  renderSquare() {
+    return (
+      <Anim animType>
+        <div
+          style={{ border: "1px solid white", height: "50px", width: "50px" }}
+        />
+      </Anim>
+    );
+  }
+
   render() {
     return (
-      <Animate animType="FADE_IN">
-        <div className="App" style={this.titleStyles.get(StylesKey.CONTAINER)}>
-          <h1 ref={this.logoRef} style={this.titleStyles.get(StylesKey.LOGO)}>
-            <AnimateSequencer>
-              <Animate>
-                <span>Visions of the</span>
-              </Animate>
-
-              <Animate animType="SLIDE_FROM_RIGHT">
-                <span>Apocalypse</span>
-              </Animate>
-            </AnimateSequencer>
-          </h1>
-
-          <div
-            className="menu_options"
-            style={this.titleStyles.get(StylesKey.MENU_OPTIONS)}
-          >
-            <p
-              style={Object.assign(
-                {},
-                { border: "2px solid #221122" },
-                this.isSelected(0)
-              )}
-            >
-              Start
-            </p>
-            <p
-              style={Object.assign(
-                {},
-                { border: "2px solid #221122" },
-                this.isSelected(1)
-              )}
-            >
-              Options
-            </p>
-          </div>
+      <Anim animType="FADE_IN">
+        <div className="App" style={TitleStyles.getContainerStyles()}>
+          {this.renderTitle()}
+          {this.renderSquare()}
+          {this.renderMenu()}
         </div>
-      </Animate>
+      </Anim>
     );
   }
 }

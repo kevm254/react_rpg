@@ -4,49 +4,27 @@ export default class TitleStyles {
   private logoStyles: any;
   private menuOptionStyles: any;
 
-  constructor() {
-    this.getContainerStyles = this.getContainerStyles.bind(this);
-  }
+  constructor() {}
 
-  get(styles: string) {
-    switch (styles) {
-      case StylesKey.CONTAINER:
-        return this.getContainerStyles();
-      case StylesKey.LOGO:
-        return this.getLogoStyles();
-      case StylesKey.MENU_OPTIONS:
-        return this.getMenuOptionsStyles();
-    }
-  }
-
-  setContainerStyles(key: string, prop: any) {
-    switch (key) {
-      case StylesKey.CONTAINER:
-        alert("inside container");
-        this.containerStyles = Object.assign({}, this.containerStyles, prop);
-      case StylesKey.LOGO:
-      case StylesKey.MENU_OPTIONS:
-    }
-  }
-
-  getContainerStyles() {
+  static getContainerStyles() {
     return {
       backgroundColor: "#221122",
       margin: "auto",
-      color: "white"
+      color: "white",
+      height: "800px"
     };
   }
 
-  getLogoStyles() {
+  static getLogoStyles(opts = { fontSize: "55px", color: "white" }) {
     return {
       paddingTop: "120px",
       fontFamily: "Coda Caption",
-      fontSize: "80px",
-      color: "white"
+      fontSize: opts.fontSize || "50px",
+      color: opts.color || "white"
     };
   }
 
-  getMenuOptionsStyles() {
+  static getMenuOptionsStyles() {
     return {
       margin: "auto",
       width: "150px",
@@ -55,9 +33,4 @@ export default class TitleStyles {
       fontSize: "25px"
     };
   }
-}
-
-export enum StylesKey {
-  CONTAINER = "CONTAINER",
-  MENU_OPTIONS = "MENU_OPTIONS"
 }

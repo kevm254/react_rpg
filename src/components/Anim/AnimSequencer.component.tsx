@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import Animate from "./Animate.component";
+import Animate from "./Anim.component";
 
-export default class AnimateSequencer extends Component {
+export default class AnimSequencer extends Component {
   constructor(props) {
     super(props);
   }
