@@ -71,7 +71,9 @@ export default class CommonAnims {
 
   static rotate(deg = 720) {
     return {
-      rotate: deg
+      rotate: deg,
+      transformOrigin: ["50% 50% 0%", "50% 50% 0%"],
+      loop: true
     };
   }
 
@@ -96,6 +98,12 @@ export default class CommonAnims {
   static contrast(from, to) {
     return {
       filter: ["contrast(5)", "contrast(0)"]
+    };
+  }
+
+  static setDuration(duration: number = 1000) {
+    return {
+      duration
     };
   }
 }

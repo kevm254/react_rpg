@@ -17,7 +17,7 @@ export default class TitleStyles {
 
   static getLogoStyles(opts = { fontSize: "55px", color: "white" }) {
     return {
-      paddingTop: "120px",
+      paddingTop: "10px",
       fontFamily: "Coda Caption",
       fontSize: opts.fontSize || "50px",
       color: opts.color || "white"

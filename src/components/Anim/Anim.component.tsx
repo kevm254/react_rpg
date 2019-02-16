@@ -4,12 +4,14 @@ import anime from "animejs";
 
 interface AnimateProps {
   animType: string;
+  duration?: number;
 }
 interface AnimateState {}
 
 export default class Anim extends Component<AnimateProps, AnimateState> {
   private containerRef: Ref;
   private animate: BaseAnims;
+  private animData: any;
 
   constructor(props) {
     super(props);
@@ -35,7 +37,18 @@ export default class Anim extends Component<AnimateProps, AnimateState> {
         ]);
         break;
       case "FADE_IN":
-        animProps = BaseAnims.fadeIn();
+        animProps = BaseAnims.constructAnim([
+          BaseAnims.fadeIn(),
+          BaseAnims.scale(0, 1),
+          BaseAnims.setDuration(5000)
+        ]);
+        break;
+      case "ROTATE":
+        animProps = BaseAnims.constructAnim([
+          BaseAnims.rotate(),
+          BaseAnims.fadeIn(),
+          BaseAnims.setDuration(5000)
+        ]);
         break;
       default:
         animProps = BaseAnims.constructAnim([
@@ -46,7 +59,7 @@ export default class Anim extends Component<AnimateProps, AnimateState> {
         ]);
     }
 
-    let test = Object.assign(
+    this.animData = Object.assign(
       {},
       {
         targets: this.containerRef.current,
@@ -55,11 +68,20 @@ export default class Anim extends Component<AnimateProps, AnimateState> {
       },
       animProps
     );
+    console.log("ANIMDATA", this.animData);
+    this.props.callback ? this.props.callback(this.animData) : null;
+    this.props.getAnimData ? this.props.getAnimData(this.animData) : null;
+  }
 
-    anime(test);
+  getAnimData() {
+    return this.animData;
   }
 
   render() {
-    return <div ref={this.containerRef}>{this.props.children}</div>;
+    return (
+      <React.Fragment>
+        {React.cloneElement(this.props.children, { ref: this.containerRef })}
+      </React.Fragment>
+    );
   }
 }
