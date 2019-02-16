@@ -7,31 +7,60 @@ export default class CommonAnims {
     this.target = target;
   }
 
-  static slideFromLeft(startPos: number = 800) {
-    return { translateX: [-startPos, 0] };
+  static constructAnim(animType, duration?) {
+    let animObj: any = {};
+    if (duration) {
+      Object.assign({}, animType, duration);
+    } else {
+      Object.assign({});
+    }
   }
 
-  static slideToLeft(endPos) {
-    return { translateX: [0, -800] };
+  static slideFromLeft(startPos: number = 800, duration?) {
+    return this.constructAnim({
+      translateX: [-startPos, 0]
+    });
   }
 
-  static slideFromRight(startPos: number = 800) {
-    return { translateX: [startPos, 0] };
+  static slideToLeft(endPos: number = 800, duration?) {
+    return {
+      translateX: [0, -800],
+      duration: 1000
+    };
   }
 
-  static slideToRight() {
-    return { translateX: [800, 0] };
+  static slideFromRight(startPos: number = 800, duration?) {
+    return {
+      translateX: [startPos, 0],
+      duration: 1000
+    };
   }
 
-  static slideFromTop() {
-    return { translateY: [] };
+  static slideToRight(startPos: number = 800, duration?) {
+    return {
+      translateX: [800, 0],
+      duration: 1000
+    };
   }
 
-  static fadeIn() {
-    return { opacity: [0, 1] };
+  static slideFromTop(startPos: number = 800, duration?) {
+    return {
+      translateY: [-800, 0],
+      duration: 1000
+    };
+  }
+
+  static fadeIn(toOpacity: number) {
+    return {
+      opacity: [0, 1],
+      duration: 1000
+    };
   }
 
   static fadeOut() {
-    return { opacity: [1, 0] };
+    return {
+      opacity: [1, 0],
+      duration: 1000
+    };
   }
 }

@@ -3,6 +3,7 @@ import TitleStyles, { StylesKey } from "./Title.styles";
 import * as anime from "animejs";
 import { Keys } from "../../Models/Keys.model";
 import Animate from "../../components/Animate/Animate.component";
+import AnimateSequencer from "../../components/Animate/AnimateSequencer.component";
 
 interface TitleProps {
   events: {
@@ -102,13 +103,15 @@ export default class Title extends Component<TitleProps, TitleState> {
       <Animate animType="FADE_IN">
         <div className="App" style={this.titleStyles.get(StylesKey.CONTAINER)}>
           <h1 ref={this.logoRef} style={this.titleStyles.get(StylesKey.LOGO)}>
-            <Animate>
-              <span>Visions of the</span>
-            </Animate>
+            <AnimateSequencer>
+              <Animate>
+                <span>Visions of the</span>
+              </Animate>
 
-            <Animate animType="SLIDE_FROM_RIGHT">
-              <span>Apocalypse</span>
-            </Animate>
+              <Animate animType="SLIDE_FROM_RIGHT">
+                <span>Apocalypse</span>
+              </Animate>
+            </AnimateSequencer>
           </h1>
 
           <div
