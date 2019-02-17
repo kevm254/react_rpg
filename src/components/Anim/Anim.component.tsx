@@ -10,6 +10,7 @@ interface AnimateState {}
 
 export default class Anim extends Component<AnimateProps, AnimateState> {
   private containerRef: Ref;
+  private animTarget: HTMLElement;
   private animate: BaseAnims;
   private animData: any;
 
@@ -18,59 +19,30 @@ export default class Anim extends Component<AnimateProps, AnimateState> {
     this.containerRef = React.createRef();
   }
 
-  initAnims() {
-    this.animate = new BaseAnims(this.containerRef);
+  setAnimTarget() {
+    this.animTarget = this.containerRef;
   }
 
   componentDidMount() {
-    let animType: string;
-    let animProps: any = {};
-    this.initAnims();
+    this.setAnimTarget();
 
-    switch (this.props.animType) {
-      case "SLIDE_FROM_RIGHT":
-        animProps = BaseAnims.constructAnim([
-          BaseAnims.fadeIn(),
-          BaseAnims.slideFromRight(),
-          BaseAnims.slideFromTop(),
-          BaseAnims.scale(4, 1)
-        ]);
-        break;
-      case "FADE_IN":
-        animProps = BaseAnims.constructAnim([
-          BaseAnims.fadeIn(),
-          BaseAnims.scale(0, 1),
-          BaseAnims.setDuration(5000)
-        ]);
-        break;
-      case "ROTATE":
-        animProps = BaseAnims.constructAnim([
-          BaseAnims.rotate(),
-          BaseAnims.fadeIn(),
-          BaseAnims.setDuration(5000)
-        ]);
-        break;
-      default:
-        animProps = BaseAnims.constructAnim([
-          BaseAnims.fadeIn(),
-          BaseAnims.slideFromBottom(),
-          BaseAnims.slideFromLeft(),
-          BaseAnims.scale(4, 1)
-        ]);
+    let anim = {
+      target: this.containerRef
+    };
+
+    let animData = {
+      targets: this.containerRef.current,
+      ...this.props.animTypes
+    };
+
+    if (this.props.animTypes) {
+      this.props.getAnimData ? this.props.getAnimData(animData) : null;
+    } else {
+      if (this.props.animID) {
+        console.log("no animdata passed to" + this.props.animID);
+        // throw new Error(`No anim data passed in to ${this.props.animID}!`);
+      }
     }
-
-    this.animData = Object.assign(
-      {},
-      {
-        targets: this.containerRef.current,
-        easing: "easeOutExpo",
-        duration: 2000
-      },
-      animProps
-    );
-    console.log("ANIMDATA", this.animData);
-    this.props.callback ? this.props.callback(this.animData) : null;
-    this.props.getAnimData ? this.props.getAnimData(this.animData) : null;
   }
 
   getAnimData() {
@@ -80,8 +52,29 @@ export default class Anim extends Component<AnimateProps, AnimateState> {
   render() {
     return (
       <React.Fragment>
-        {React.cloneElement(this.props.children, { ref: this.containerRef })}
+        {React.cloneElement(this.props.children, {
+          ref: this.containerRef,
+          onClick: () => {
+            this.props.animOnClick ? this.props.animOnClick() : null;
+          },
+          onMouseOver: () => {},
+          onMouseLeave: () => {}
+        })}
       </React.Fragment>
     );
   }
 }
+
+// anime
+//   .timeline()
+//   .add({
+//     targets: this.containerRef.current,
+//     translateY: [0, 200],
+//     opacity: [1, 0]
+//   })
+//   .add({
+//     targets: this.containerRef.current,
+//     opacity: [0, 1],
+//     translateY: [200, 0]
+//   })
+//   .play();

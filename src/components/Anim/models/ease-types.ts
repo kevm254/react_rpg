@@ -1,4 +1,5 @@
 export enum EaseType {
+  LINEAR = "linear",
   EASE_IN_QUAD = "easeInQuad",
   EASE_IN_CUBIC = "easeInCubic",
   EASE_IN_QUART = "easeInQuart",

@@ -10,7 +10,6 @@ export default class AnimSequencer extends Component {
   animQueue: [] = [];
 
   componentDidMount() {
-    console.log("ANIMQUEUE", this.animQueue);
     this.props.animQueue
       ? this.props.animQueue.forEach(anim => {
           Anime(anim);
@@ -20,6 +19,7 @@ export default class AnimSequencer extends Component {
 
   registerAnim(animData) {
     this.animQueue.push(animData);
+    console.log(">>>>>>>>>>>>>>>>>>>", animData);
   }
 
   render() {

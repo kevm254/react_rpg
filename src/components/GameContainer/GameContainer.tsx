@@ -1,6 +1,8 @@
 import React, { Component } from "react";
+import InputListener from "../InputListener/InputListener.component";
 import StartGame from "../../states/playGame/playGame.component";
 import Title from "../../states/title/Title";
+import Debug from "../../states/debug/debug.state";
 import * as THREE from "three";
 
 export default class GameContainer extends Component {
@@ -8,7 +10,7 @@ export default class GameContainer extends Component {
     super(props);
 
     this.state = {
-      currentState: "TITLE"
+      currentState: "START_GAME"
     };
 
     this.bindAll();
@@ -32,6 +34,8 @@ export default class GameContainer extends Component {
         return <Title events={{ updateGameState: this.updateGameState }} />;
       case "START_GAME":
         return <StartGame />;
+      case "DEBUG":
+        return <Debug />;
       default:
         return <Title events={{ updateGameState: this.updateGameState }} />;
     }
@@ -44,7 +48,9 @@ export default class GameContainer extends Component {
   render() {
     return (
       <div style={{ height: 550, width: 800, overflow: "hidden" }}>
-        {this.getGameState(this.state.currentState)}
+        <InputListener>
+          {this.getGameState(this.state.currentState)}
+        </InputListener>
       </div>
     );
   }

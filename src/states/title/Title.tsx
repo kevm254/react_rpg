@@ -3,6 +3,7 @@ import TitleStyles from "./Title.styles";
 import * as anime from "animejs";
 import { Keys } from "../../Models/Keys.model";
 import TitleMenu from "./Menu.fragment";
+import TitleLogo from "./Title.fragment";
 import Anim from "../../components/Anim/Anim.component";
 import AnimateSequencer from "../../components/Anim/AnimSequencer.component";
 
@@ -17,24 +18,24 @@ export default class Title extends Component<TitleProps, TitleState> {
   titleStyles: TitleStyles;
   selectedOption: any[] = [];
   animQueue: any[] = [];
+  anims;
 
   constructor(props) {
     super(props);
     this.bindAll();
     this.initVars(props);
+    this.initState;
 
     this.setupState();
     this.setupStyles();
     this.setupKeyListeners();
   }
 
-  componentDidMount() {
-    this.runAnimsOnInit();
-  }
+  componentDidMount() {}
 
   bindAll() {
     this.setupStyles = this.setupStyles.bind(this);
-    this.runAnimsOnInit = this.runAnimsOnInit.bind(this);
+
     this.initVars = this.initVars.bind(this);
     this.updateGameState = this.updateGameState.bind(this);
     this.registerAnim = this.registerAnim.bind(this);
@@ -89,32 +90,10 @@ export default class Title extends Component<TitleProps, TitleState> {
     });
   }
 
-  runAnimsOnInit() {}
-
-  combineStyles(styles) {
-    Object.assign({}, ...styles);
-  }
-
   isSelected(itemSelection) {
     if (this.state.isSelected === itemSelection) {
       return { border: "2px solid yellow", borderRadius: "4px" };
     }
-  }
-
-  renderTitle1() {
-    return (
-      <Anim getAnimData={this.registerAnim}>
-        <h1 style={TitleStyles.getLogoStyles()}>Visions of the</h1>
-      </Anim>
-    );
-  }
-
-  renderTitle2() {
-    return (
-      <Anim getAnimData={this.registerAnim} animType="SLIDE_FROM_RIGHT">
-        <h1 style={TitleStyles.getLogoStyles()}>Apocalypse</h1>
-      </Anim>
-    );
   }
 
   registerAnim(animData) {
@@ -123,7 +102,7 @@ export default class Title extends Component<TitleProps, TitleState> {
 
   renderSquare() {
     return (
-      <Anim animType="ROTATE" getAnimData={this.registerAnim}>
+      <Anim animType="ROTATE" getAnimData={this.registerAnim} animID="SQUARE">
         <div
           style={{ border: "1px solid white", height: "50px", width: "50px" }}
         />
@@ -135,14 +114,8 @@ export default class Title extends Component<TitleProps, TitleState> {
     return (
       <div className="App" style={TitleStyles.getContainerStyles()}>
         <AnimateSequencer animQueue={this.animQueue}>
-          {this.renderTitle1()}
-          {this.renderTitle2()}
+          {TitleLogo(this)}
           {TitleMenu(this)}
-          <div>
-            <Anim animType="ROTATE" getAnimData={this.registerAnim}>
-              <p>Hi there</p>
-            </Anim>
-          </div>
         </AnimateSequencer>
       </div>
     );

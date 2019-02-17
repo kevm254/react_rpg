@@ -1,14 +1,16 @@
 import anime from "animejs";
+import { EaseType } from "./models/ease-types";
+import { Transform_Origin } from "./models/transform-origins";
+import { getTransformOrigin } from "./models/transform-origins";
 
-export default class CommonAnims {
+export default class BaseAnims {
   target: any;
 
   constructor(target) {
     this.target = target;
   }
 
-  static constructAnim(animTypes: any[], duration?) {
-    console.log(">>>>>>>>>>>>>");
+  static constructAnim(animTypes: any[]) {
     let animObj: any = {};
     if (Array.isArray(animTypes)) {
       animTypes.forEach(anim => {
@@ -17,7 +19,7 @@ export default class CommonAnims {
     } else {
       throw new Error("Please provide an array of animations");
     }
-    console.log(animObj);
+
     return animObj;
   }
 
@@ -71,9 +73,7 @@ export default class CommonAnims {
 
   static rotate(deg = 720) {
     return {
-      rotate: deg,
-      transformOrigin: ["50% 50% 0%", "50% 50% 0%"],
-      loop: true
+      rotate: deg
     };
   }
 
@@ -101,9 +101,33 @@ export default class CommonAnims {
     };
   }
 
+  static skew(from, to) {
+    return {
+      skew: [-50, 0]
+    };
+  }
+
   static setDuration(duration: number = 1000) {
     return {
       duration
     };
+  }
+
+  static setEasing(easing: EaseType = EaseType.LINEAR) {
+    return {
+      easing
+    };
+  }
+
+  static setTransformOrigin(
+    transformOrigin = getTransformOrigin(Transform_Origin.LINEAR)
+  ) {
+    return {
+      transformOrigin
+    };
+  }
+
+  static loopAnim(loop: boolean) {
+    loop: true;
   }
 }
