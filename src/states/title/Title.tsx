@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import TitleStyles from "./Title.styles";
 import * as anime from "animejs";
-import { Keys } from "../../Models/Keys.model";
+import { Keys } from "../../Models/keys.model";
 import TitleMenu from "./Menu.fragment";
 import TitleLogo from "./Title.fragment";
 import Anim from "../../components/Anim/Anim.component";

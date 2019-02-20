@@ -10,7 +10,7 @@ export default class GameContainer extends Component {
     super(props);
 
     this.state = {
-      currentState: "START_GAME"
+      currentState: "TITLE"
     };
 
     this.bindAll();

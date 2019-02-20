@@ -9,9 +9,16 @@ export default class TitleStyles {
   static getContainerStyles() {
     return {
       backgroundColor: "#221122",
+      backgroundImage: "linear-gradient(#221122 20%, #000000 50%)",
       margin: "auto",
       color: "white",
       height: "800px"
+    };
+  }
+
+  static getTitleContainerStyles() {
+    return {
+      paddingTop: "40px"
     };
   }
 
@@ -29,7 +36,7 @@ export default class TitleStyles {
       margin: "auto",
       width: "150px",
       textAlign: "center",
-      marginTop: "80px",
+      marginTop: "100px",
       fontSize: "25px"
     };
   }

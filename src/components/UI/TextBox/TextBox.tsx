@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import TextBoxStyles from "./TextBox.styles";
+import { Keys } from "../../../Models/keys.model";
 import Anim from "../../Anim/Anim.component";
 import AnimSequencer from "../../Anim/AnimSequencer.component";
 import BaseAnims from "../../Anim/base-anims";
@@ -12,52 +13,98 @@ const animTypes = BaseAnims.constructAnim([
 ]);
 
 export default class TextBox extends Component {
-  defaultText: string = `You wake up in the remains of a once beautiful, but now ruined city.
-       Flames swirl all around you, devouring the remains of houses and cars. 
-       In the midst of the chaos, you take a small minute to ponder how or why
-       you survived. You see a stranger approaching...`;
   currentTextPos: number = 0;
   currentInterval: any;
   textLength: number;
+  textFinished: boolean = false; // text finished showing
   animQueue: [] = [];
 
   constructor(props) {
     super(props);
 
     this.state = {
-      currentText: ""
+      storedText: "",
+      currentText: "",
+      textFinished: false
     };
 
     this.bindAll();
   }
 
+  // LIFE-CYCLE METHODS ////////////////////
+  componentDidUpdate(prevProps) {
+    if (prevProps !== this.props) {
+      if (this.props.spaceWasPressed) {
+        alert(this.state.textFinished);
+        if (this.state.textFinished) {
+          this.props.requestNewText();
+        } else {
+          clearInterval(this.currentInterval);
+          this.setState({ currentText: this.props.sceneText });
+          this.setState({ textFinished: true });
+          // this.props.textIsFinished();
+        }
+      }
+      if (prevProps.sceneText !== this.props.sceneText) {
+        this.updateCurrentText(this.props.sceneText);
+      }
+      // if (this.textFinished) {
+
+      // } else {
+
+      // }
+    }
+  }
+
+  componentDidMount() {
+    this.updateCurrentText(this.props.sceneText);
+  }
+
+  // GENERAL METHODS //////////////////////
   setLength(text: string) {
     this.textLength = text.length;
   }
 
-  componentWillMount() {
-    document.addEventListener("keyup", e => {
-      console.dir(e);
-    });
+  resetTextPos() {
+    this.currentTextPos = 0;
   }
 
-  componentDidMount() {
-    this.setLength(this.defaultText);
-    this.currentInterval = this.setTextInterval();
-    console.log("ANIMTYPES", animTypes);
+  showAllText();
+
+  updateCurrentText(text: string) {
+    if (this.currentInterval) {
+      clearInterval(this.currentInterval);
+    }
+    this.resetTextPos();
+    this.clearCurrentText();
+    this.setTextInterval(50, text);
   }
 
-  setTextInterval() {
-    return setInterval(() => {
+  clearCurrentText() {
+    this.setState({ currentText: "" });
+  }
+
+  setTextInterval(interval: number = 50, text?: string) {
+    clearInterval(this.currentInterval);
+    this.setLength(text);
+
+    this.currentInterval = setInterval(() => {
       if (this.currentTextPos < this.textLength) {
         this.currentTextPos++;
         this.setState({
-          currentText: this.defaultText.slice(0, this.currentTextPos)
+          currentText: text.slice(0, this.currentTextPos)
         });
       } else {
         clearInterval(this.currentInterval);
+        this.setState({ textFinished: true });
+        // this.props.requestNewText();
       }
-    }, 50);
+    }, interval);
+  }
+
+  updateText() {
+    this.currentTextPos = 0;
+    this.setTextLength();
   }
 
   bindAll() {

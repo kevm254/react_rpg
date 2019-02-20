@@ -6,20 +6,20 @@ import TitleStyles from "./Title.styles";
 const title1Anim = BaseAnims.constructAnim([
   BaseAnims.slideFromLeft(),
   BaseAnims.slideFromTop(),
-  BaseAnims.setDuration(1000),
+  BaseAnims.setDuration(1400),
   BaseAnims.setEasing()
 ]);
 
 const title2Anim = BaseAnims.constructAnim([
   BaseAnims.slideFromRight(),
   BaseAnims.slideFromBottom(),
-  BaseAnims.setDuration(1000),
+  BaseAnims.setDuration(1400),
   BaseAnims.setEasing()
 ]);
 
 export default parent => {
   return (
-    <div>
+    <div style={TitleStyles.getTitleContainerStyles()}>
       <Anim
         animTypes={title1Anim}
         getAnimData={parent.registerAnim}

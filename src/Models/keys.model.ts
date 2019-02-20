@@ -3,5 +3,6 @@ export enum Keys {
   DOWN = 40,
   LEFT = 37,
   RIGHT = 39,
-  ENTER = 13
+  ENTER = 13,
+  SPACEBAR = 32
 }
