@@ -8,7 +8,8 @@ const animTypes = BaseAnims.constructAnim([
   BaseAnims.fadeIn(),
   BaseAnims.setDuration(800),
   BaseAnims.blur(),
-  BaseAnims.setEasing()
+  BaseAnims.setEasing(),
+  BaseAnims.slideFromLeft(100)
 ]);
 
 export default class SceneDisplay extends Component {
@@ -18,6 +19,8 @@ export default class SceneDisplay extends Component {
     super(props);
     this.bindAll();
   }
+
+  componentDidMount() {}
 
   bindAll() {
     this.registerAnim = this.registerAnim.bind(this);
@@ -38,7 +41,7 @@ export default class SceneDisplay extends Component {
           >
             <img
               style={{ height: "auto", width: "100%" }}
-              src="https://i.pinimg.com/originals/4c/82/0e/4c820e2dd67a7a6dbbc3804db7a2eb66.jpg"
+              src={this.props.sceneImg}
             />
           </Anim>
         </AnimSequencer>

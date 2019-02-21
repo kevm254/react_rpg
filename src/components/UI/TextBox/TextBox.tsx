@@ -1,9 +1,10 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import TextBoxStyles from "./TextBox.styles";
 import { Keys } from "../../../Models/keys.model";
 import Anim from "../../Anim/Anim.component";
 import AnimSequencer from "../../Anim/AnimSequencer.component";
 import BaseAnims from "../../Anim/base-anims";
+import ProfileDisplay from "./ProfileDisplay/ProfileDisplay";
 
 const animTypes = BaseAnims.constructAnim([
   BaseAnims.slideFromLeft(),
@@ -35,24 +36,19 @@ export default class TextBox extends Component {
   componentDidUpdate(prevProps) {
     if (prevProps !== this.props) {
       if (this.props.spaceWasPressed) {
-        alert(this.state.textFinished);
         if (this.state.textFinished) {
           this.props.requestNewText();
         } else {
           clearInterval(this.currentInterval);
           this.setState({ currentText: this.props.sceneText });
           this.setState({ textFinished: true });
-          // this.props.textIsFinished();
+          this.props.textIsFinished();
         }
       }
       if (prevProps.sceneText !== this.props.sceneText) {
         this.updateCurrentText(this.props.sceneText);
+        this.setState({ textFinished: false });
       }
-      // if (this.textFinished) {
-
-      // } else {
-
-      // }
     }
   }
 
@@ -117,17 +113,22 @@ export default class TextBox extends Component {
 
   render() {
     return (
-      <AnimSequencer animQueue={this.animQueue}>
-        <Anim
-          animTypes={animTypes}
-          getAnimData={this.registerAnim}
-          animID="TEXTBOX"
-        >
-          <div style={TextBoxStyles.getTextBoxContainerStyles()}>
-            <p>{this.state.currentText}</p>
-          </div>
-        </Anim>
-      </AnimSequencer>
+      <div style={{ position: "relative" }}>
+        {this.props.displayProfile && (
+          <ProfileDisplay profileImage={this.props.profileImage} />
+        )}
+        <AnimSequencer animQueue={this.animQueue}>
+          <Anim
+            animTypes={animTypes}
+            getAnimData={this.registerAnim}
+            animID="TEXTBOX"
+          >
+            <div style={TextBoxStyles.getTextBoxContainerStyles()}>
+              <p>{this.state.currentText}</p>
+            </div>
+          </Anim>
+        </AnimSequencer>
+      </div>
     );
   }
 }
