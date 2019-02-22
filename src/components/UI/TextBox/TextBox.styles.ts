@@ -15,4 +15,10 @@ export default class TextBoxStyles {
       padding: "20px 20px"
     };
   }
+
+  static changeBackgroundColor() {
+    return {
+      backgroundImage: "linear-gradient(#0f1a2d, #647591)"
+    };
+  }
 }

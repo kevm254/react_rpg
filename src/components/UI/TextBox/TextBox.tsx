@@ -35,19 +35,23 @@ export default class TextBox extends Component {
   // LIFE-CYCLE METHODS ////////////////////
   componentDidUpdate(prevProps) {
     if (prevProps !== this.props) {
-      if (this.props.spaceWasPressed) {
+      if (
+        this.props.spaceWasPressed &&
+        this.props.spaceWasPressed !== prevProps.spaceWasPressed
+      ) {
         if (this.state.textFinished) {
           this.props.requestNewText();
+          this.setState({ textFinished: false });
+          this.props.textIsFinished(false);
         } else {
           clearInterval(this.currentInterval);
           this.setState({ currentText: this.props.sceneText });
           this.setState({ textFinished: true });
-          this.props.textIsFinished();
+          this.props.textIsFinished(true);
         }
       }
       if (prevProps.sceneText !== this.props.sceneText) {
         this.updateCurrentText(this.props.sceneText);
-        this.setState({ textFinished: false });
       }
     }
   }
