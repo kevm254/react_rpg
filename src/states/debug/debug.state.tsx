@@ -210,7 +210,7 @@ export default class DebugState extends Component {
           targets: this.playerRef.current,
           scale: [1, 5, 1],
           rotate: 720,
-          easing: "linear"
+          easing: "easeOutCubic"
         });
       }, 200);
 
@@ -285,6 +285,8 @@ export default class DebugState extends Component {
                 width: "64px",
                 borderRadius: "100px",
                 backgroundColor: "blue",
+                background:
+                  "radial-gradient(circle, rgba(238, 174, 202, 1) 0 %, rgba(64, 32, 180, 1) 100 %)",
                 top: "32px",
                 position: "absolute",
                 border: "1px solid black",
