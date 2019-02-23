@@ -13,6 +13,8 @@ export default class Tilemap extends Component {
         return "http://www.textures4photoshop.com/tex/thumbs/sand-with-pebbles-texture-high-res-thumb34.jpg";
       case 3:
         return "https://img-aws.ehowcdn.com/350x235p/photos.demandstudios.com/getty/article/178/191/78325586_XS.jpg";
+      case 4:
+        return "http://pixelartmaker.com/art/7d4798f93892ddc.png";
     }
   }
   render() {
