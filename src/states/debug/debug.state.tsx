@@ -13,20 +13,23 @@ export default class DebugState extends Component {
       playerXPos: 0,
       playerYPos: 0,
       maxHP: 10,
-      currentHP: 10
+      currentHP: 10,
+      playerDirection: "DOWN",
+      rolled: false
     };
 
     this.bindAll();
   }
   playerRef = React.createRef();
+  innerPlayerRef = React.createRef();
   playerMouthRef = React.createRef();
 
   data = [
-    [1, 3, 1, 4, 1, 1, 1, 2, 1, 1],
-    [1, 3, 1, 4, 4, 2, 1, 2, 1, 1],
-    [1, 1, 1, 1, 1, 2, 1, 2, 1, 1],
-    [3, 3, 3, 3, 1, 1, 1, 2, 1, 1],
-    [1, 2, 2, 2, 1, 2, 1, 2, 1, 1],
+    [2, 3, 1, 5, 1, 1, 1, 2, 1, 1],
+    [2, 3, 3, 5, 4, 4, 4, 4, 4, 1],
+    [2, 2, 2, 2, 2, 2, 1, 2, 4, 1],
+    [1, 1, 1, 1, 1, 1, 1, 2, 1, 1],
+    [3, 3, 3, 3, 3, 2, 1, 2, 1, 1],
     [1, 1, 1, 1, 1, 1, 1, 2, 1, 1],
     [1, 1, 1, 1, 1, 1, 1, 2, 1, 1],
     [1, 1, 1, 1, 1, 1, 1, 2, 1, 1],
@@ -51,12 +54,27 @@ export default class DebugState extends Component {
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   ];
 
+  lightMap = [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  ];
+
   obstructionMap = [
     [0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 1, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [1, 1, 1, 1, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -68,8 +86,8 @@ export default class DebugState extends Component {
 
   damageMap = [
     [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 1, 1, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 1, 1, 1, 1, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -127,9 +145,30 @@ export default class DebugState extends Component {
           targets: this.playerRef.current,
           translateX: 64 * this.state.playerXPos,
           // scale: [1, 1.05, 1],
-          easing: "linear",
+          easing: "easeOutQuad",
           duration: 300
         });
+
+        anime({
+          // /  targets:
+        });
+        this.updatePlayerDirection("RIGHT");
+
+        this.setState({ isRolled: !this.state.isRolled });
+
+        this.state.isRolled
+          ? anime({
+              targets: this.innerPlayerRef.current,
+              rotate: [0, 180],
+              easing: "easeOutQuad",
+              duration: 350
+            })
+          : anime({
+              targets: this.innerPlayerRef.current,
+              rotate: [180, 360],
+              easing: "easeOutQuad",
+              duration: 350
+            });
 
         this.checkForDamage({
           x: this.state.playerXPos,
@@ -143,10 +182,27 @@ export default class DebugState extends Component {
         anime({
           targets: this.playerRef.current,
           translateX: 64 * this.state.playerXPos,
-          // scale: [1, 1.05, 1],
-          easing: "linear",
+          easing: "easeOutCubic",
           duration: 300
         });
+
+        this.updatePlayerDirection("LEFT");
+
+        this.setState({ isRolled: !this.state.isRolled });
+
+        this.state.isRolled
+          ? anime({
+              targets: this.innerPlayerRef.current,
+              rotate: [360, 180],
+              easing: "easeOutQuad",
+              duration: 350
+            })
+          : anime({
+              targets: this.innerPlayerRef.current,
+              rotate: [180, 0],
+              easing: "easeOutQuad",
+              duration: 350
+            });
 
         this.checkForDamage({
           x: this.state.playerXPos,
@@ -160,10 +216,11 @@ export default class DebugState extends Component {
         anime({
           targets: this.playerRef.current,
           translateY: 64 * this.state.playerYPos,
-          // scale: [1, 1.05, 1],
-          easing: "linear",
+          easing: "easeOutCubic",
           duration: 300
         });
+
+        this.updatePlayerDirection("UP");
 
         this.checkForDamage({
           x: this.state.playerXPos,
@@ -177,9 +234,11 @@ export default class DebugState extends Component {
           targets: this.playerRef.current,
           translateY: 64 * this.state.playerYPos,
           // scaleX: [1, 1.05, 1],
-          easing: "linear",
+          easing: "easeOutCubic",
           duration: 300
         });
+
+        this.updatePlayerDirection("DOWN");
 
         this.checkForDamage({
           x: this.state.playerXPos,
@@ -201,6 +260,10 @@ export default class DebugState extends Component {
       translateY: 64 * playerYPos,
       easing: "linear"
     });
+  }
+
+  updatePlayerDirection(direction: string) {
+    this.setState({ playerDirection: direction });
   }
 
   checkForDamage(playerPos) {
@@ -249,12 +312,20 @@ export default class DebugState extends Component {
     }
   }
 
-  renderRow(dataSource, row: boolean) {
-    dataSource.forEach(row => {
+  renderRow(dataSource: [], row: boolean) {
+    dataSource.map((row, i) => {
+      let currentRow = i;
+
       this.tiles.push(
         row.map((item, i) => {
           return (
-            <Tile color="green" row={true} tileNo={item} showBorder={false} />
+            <Tile
+              color="green"
+              row={true}
+              tileNo={item}
+              showBorder={false}
+              brightness={this.lightMap[currentRow][i]}
+            />
           );
         }),
         <br />
@@ -265,6 +336,19 @@ export default class DebugState extends Component {
 
   restartGame() {
     this.setState({ playerXPos: 0, playerYPos: 0, currentHP: 10 });
+  }
+
+  setPlayerMouthPos(state: string) {
+    switch (state) {
+      case "DOWN":
+        return "16px";
+        break;
+      case "LEFT":
+        return "44px";
+        break;
+      case "RIGHT":
+        return "-10px";
+    }
   }
 
   render() {
@@ -279,105 +363,197 @@ export default class DebugState extends Component {
             <div style={{ position: "fixed", right: "50px" }}>
               PlayerPos: [{this.state.playerXPos}, {this.state.playerYPos}]
             </div>
+
             <div
-              style={{
-                height: "64px",
-                width: "64px",
-                borderRadius: "100px",
-                backgroundColor: "blue",
-                background:
-                  "radial-gradient(circle, rgba(238, 174, 202, 1) 0 %, rgba(64, 32, 180, 1) 100 %)",
-                top: "32px",
-                position: "absolute",
-                border: "1px solid black",
-                boxSizing: "border-box"
-              }}
               ref={this.playerRef}
+              style={{
+                position: "relative",
+                height: "64px",
+                width: "64px"
+              }}
             >
-              <div class="face" style={{ position: "relative" }}>
-                <div
-                  className="player_eye_left"
+              <div
+                ref={this.innerPlayerRef}
+                style={{
+                  height: "64px",
+                  top: "64px",
+                  width: "64px",
+                  borderRadius: "100px",
+                  backgroundColor: "royalblue",
+                  overflow: "hidden",
+                  position: "absolute",
+                  border: "1px solid black",
+                  boxSizing: "border-box",
+                  zIndex: 1
+                }}
+              >
+                <img
+                  src={"./img/player_texture.png"}
                   style={{
-                    backgroundColor: "black",
-                    borderRadius: "50px",
-                    height: "17px",
-                    width: "17px",
                     position: "absolute",
-                    top: "11px",
-                    left: "7px",
-                    border: "1px solid black",
-                    backgroundColor: "white",
-                    overflow: "hidden"
+                    height: "64px",
+                    width: "64px",
+                    top: 0,
+                    left: 0
                   }}
-                >
-                  <div
-                    className="player_inner_eye_left"
-                    style={{
-                      position: "relative",
-                      bottom: "2px",
-                      backgroundColor: "black",
-                      height: "14px",
-                      width: "14px",
-                      borderRadius: "50px"
-                    }}
-                  />
-                </div>
-                <div
-                  className="player_eye_right"
-                  style={{
-                    backgroundColor: "black",
-                    borderRadius: "50px",
-                    height: "17px",
-                    width: "17px",
-                    position: "absolute",
-                    top: "11px",
-                    right: "7px",
-                    border: "1px solid black",
-                    backgroundColor: "white",
-                    overflow: "hidden"
-                  }}
-                >
-                  <div
-                    className="player_inner_eye_right"
-                    style={{
-                      position: "relative",
-                      bottom: "2px",
-                      backgroundColor: "black",
-                      height: "14px",
-                      width: "14px",
-                      borderRadius: "50px"
-                    }}
-                  />
-                </div>
-                <div
-                  className="player_mouth"
-                  style={{
-                    backgroundColor: "black",
-                    borderRadius: "50px",
-                    height: "10px",
-                    width: "25px",
-                    position: "absolute",
-                    top: "37px",
-                    right: "16px",
-                    backgroundColor: "black",
-                    border: "2px solid black"
-                  }}
-                  ref={this.playerMouthRef}
-                >
-                  <div
-                    className="player_inner_mouth"
-                    style={{
-                      height: "5px",
-                      width: "10px",
-                      borderRadius: "20px",
-                      backgroundColor: "red",
-                      position: "relative",
-                      left: "7px",
-                      top: "5px"
-                    }}
-                  />
+                />
+                <div class="face" style={{ position: "relative" }}>
+                  {(this.state.playerDirection === "DOWN" ||
+                    this.state.playerDirection === "LEFT") && (
+                    <div
+                      className="player_eye_left"
+                      style={{
+                        backgroundColor: "black",
+                        borderRadius: "50px",
+                        height: "17px",
+                        width: "14px",
+                        position: "absolute",
+                        top: "11px",
+                        left: "10px",
+                        border: "1px solid black",
+                        backgroundColor: "white",
+                        overflow: "hidden"
+                      }}
+                    >
+                      <div
+                        className="player_left_eye_lid"
+                        style={{
+                          backgroundColor: "blue",
+                          height: "17px",
+                          width: "14px"
+                        }}
+                      />
+                      <div
+                        className="player_inner_eye_left"
+                        style={{
+                          position: "relative",
+                          bottom: "2px",
+                          backgroundColor: "black",
+                          height: "14px",
+                          width: "14px",
+                          borderRadius: "50px"
+                        }}
+                      >
+                        <div
+                          className="player_inner_eye_left"
+                          style={{
+                            position: "absolute",
+                            left: "7px",
+                            top: "2px",
+                            backgroundColor: "black",
+                            height: "5px",
+                            width: "5px",
+                            backgroundColor: "white",
+                            opacity: ".7",
+                            borderRadius: "100px"
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {(this.state.playerDirection === "DOWN" ||
+                    this.state.playerDirection === "RIGHT") && (
+                    <div
+                      className="player_eye_right"
+                      style={{
+                        backgroundColor: "black",
+                        borderRadius: "50px",
+                        height: "17px",
+                        width: "14px",
+                        position: "absolute",
+                        top: "11px",
+                        right: "10px",
+                        border: "1px solid black",
+                        backgroundColor: "white",
+                        overflow: "hidden"
+                      }}
+                    >
+                      <div
+                        className="player_right_eye_lid"
+                        style={{
+                          backgroundColor: "blue",
+                          height: "17px",
+                          width: "14px"
+                        }}
+                      />
+                      <div
+                        className="player_inner_eye_right"
+                        style={{
+                          position: "relative",
+                          bottom: "2px",
+                          backgroundColor: "black",
+                          height: "14px",
+                          width: "14px",
+                          borderRadius: "50px"
+                        }}
+                      >
+                        <div
+                          className="player_inner_eye_left"
+                          style={{
+                            position: "absolute",
+                            left: "7px",
+                            top: "2px",
+                            backgroundColor: "black",
+                            height: "5px",
+                            width: "5px",
+                            backgroundColor: "white",
+                            opacity: ".7",
+                            borderRadius: "100px"
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {this.state.playerDirection !== "UP" && (
+                    <div
+                      className="player_mouth"
+                      style={{
+                        backgroundColor: "black",
+                        borderRadius: "50px",
+                        height: "10px",
+                        width: "25px",
+                        position: "absolute",
+                        top: "37px",
+                        right: this.setPlayerMouthPos(
+                          this.state.playerDirection
+                        ),
+                        backgroundColor: "black",
+                        border: "2px solid black"
+                      }}
+                      ref={this.playerMouthRef}
+                    >
+                      <div
+                        className="player_inner_mouth"
+                        style={{
+                          height: "5px",
+                          width: "10px",
+                          borderRadius: "20px",
+                          backgroundColor: "red",
+                          position: "relative",
+                          left: "7px",
+                          top: "5px"
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
+              <div
+                class="player_shadow"
+                style={{
+                  position: "absolute",
+                  backgroundColor: "black",
+                  borderRadius: "190px",
+                  height: "14px",
+                  width: "55px",
+                  left: "0px",
+                  opacity: ".4",
+                  top: "115px",
+                  zIndex: 0
+                }}
+              />
             </div>
             {this.state.tiles}
           </div>
