@@ -3,6 +3,7 @@ import InputListener from "../InputListener/InputListener.component";
 import StartGame from "../../states/playGame/playGame.component";
 import Title from "../../states/title/Title";
 import Debug from "../../states/debug/debug.state";
+import Debug2 from "../../states/debug/debug2.state";
 import * as THREE from "three";
 
 export default class GameContainer extends Component {
@@ -36,6 +37,8 @@ export default class GameContainer extends Component {
         return <StartGame />;
       case "DEBUG":
         return <Debug />;
+      case "DEBUG2":
+        return <Debug2 />;
       default:
         return <Title events={{ updateGameState: this.updateGameState }} />;
     }

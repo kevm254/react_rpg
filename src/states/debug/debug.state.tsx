@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import TextBox from "../../components/UI/TextBox/TextBox";
-import Tile from "../../components/Tile/Tilemap/Tilemap.component";
+import Tile from "../../components/Tile/Tilemap/Tile.component";
 import anime from "animejs";
 import { Keys } from "../../Models/keys.model";
 
@@ -15,7 +15,8 @@ export default class DebugState extends Component {
       maxHP: 10,
       currentHP: 10,
       playerDirection: "DOWN",
-      rolled: false
+      rolled: false,
+      showObstrructions: false
     };
 
     this.bindAll();
@@ -103,6 +104,7 @@ export default class DebugState extends Component {
 
   bindAll() {
     this.restartGame = this.restartGame.bind(this);
+    this.toggleObstructionMap = this.toggleObstructionMap.bind(this);
   }
 
   componentWillMount() {
@@ -121,21 +123,33 @@ export default class DebugState extends Component {
 
     anime({
       targets: [".player_inner_eye_left"],
-      translateY: [0, 1, 0, -1, 0],
-      translateX: [0, 1, 0, 1],
+      // translateY: [0, 1, 0, -1, 0],
+      translateX: [0, 7, 0],
       easing: "linear",
-      loop: true,
-      duration: 800
+      loop: false,
+      duration: 1000
     });
 
     anime({
       targets: [".player_inner_eye_right"],
-      translateY: [0, 2, 0, -1, 0],
-      translateX: [0, -1, 0, -1, 0],
+      // translateY: [0, 2, 0, -1, 0],
+      translateX: [0, 7, 0],
       easing: "linear",
-      loop: true,
-      duration: 800
+      loop: false,
+      duration: 1000
     });
+
+    let blinkAnim = anime
+      .timeline({
+        loop: false,
+        easing: "easeInQuart",
+        duration: 1200
+      })
+      .add({
+        targets: [".player_left_eye_lid", ".player_right_eye_lid"],
+        translateY: [0, 44, 0]
+      })
+      .play();
 
     document.body.addEventListener("keydown", e => {
       if (e.keyCode === Keys.RIGHT && this.canMove("RIGHT")) {
@@ -254,14 +268,6 @@ export default class DebugState extends Component {
     }, 3000);
   }
 
-  moveCharacterY(playerYPos: number) {
-    return anime({
-      targets: this.playerRef.current,
-      translateY: 64 * playerYPos,
-      easing: "linear"
-    });
-  }
-
   updatePlayerDirection(direction: string) {
     this.setState({ playerDirection: direction });
   }
@@ -351,10 +357,15 @@ export default class DebugState extends Component {
     }
   }
 
+  toggleObstructionMap() {
+    this.setState({ showObstructions: !this.state.showObstructions });
+  }
+
   render() {
     return (
       <div style={{ backgroundColor: "#000000", color: "#FFFFFF" }} id="player">
         <h1>Debug Screen</h1>
+        <button onClick={this.toggleObstructionMap}>Toggle Obstructions</button>
         {this.state.currentHP !== 0 ? (
           <div id="game_container">
             <div style={{ position: "fixed", bottom: "50px", left: "50px" }}>
@@ -410,6 +421,7 @@ export default class DebugState extends Component {
                         position: "absolute",
                         top: "11px",
                         left: "10px",
+                        psoition: "relative",
                         border: "1px solid black",
                         backgroundColor: "white",
                         overflow: "hidden"
@@ -418,16 +430,20 @@ export default class DebugState extends Component {
                       <div
                         className="player_left_eye_lid"
                         style={{
-                          backgroundColor: "blue",
+                          position: "absolute",
+                          top: -44,
+                          left: 0,
                           height: "17px",
-                          width: "14px"
+                          width: "14px",
+                          backgroundColor: "blue",
+                          zIndex: 520
                         }}
                       />
                       <div
                         className="player_inner_eye_left"
                         style={{
                           position: "relative",
-                          bottom: "2px",
+                          bottom: "-4px",
                           backgroundColor: "black",
                           height: "14px",
                           width: "14px",
@@ -465,6 +481,7 @@ export default class DebugState extends Component {
                         top: "11px",
                         right: "10px",
                         border: "1px solid black",
+                        psition: "relative",
                         backgroundColor: "white",
                         overflow: "hidden"
                       }}
@@ -472,16 +489,20 @@ export default class DebugState extends Component {
                       <div
                         className="player_right_eye_lid"
                         style={{
-                          backgroundColor: "blue",
+                          position: "absolute",
+                          top: -44,
+                          left: 0,
                           height: "17px",
-                          width: "14px"
+                          width: "14px",
+                          backgroundColor: "blue",
+                          zIndex: 520
                         }}
                       />
                       <div
                         className="player_inner_eye_right"
                         style={{
                           position: "relative",
-                          bottom: "2px",
+                          bottom: "-4px",
                           backgroundColor: "black",
                           height: "14px",
                           width: "14px",
