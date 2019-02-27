@@ -64,17 +64,3 @@ export default class Anim extends Component<AnimateProps, AnimateState> {
     );
   }
 }
-
-// anime
-//   .timeline()
-//   .add({
-//     targets: this.containerRef.current,
-//     translateY: [0, 200],
-//     opacity: [1, 0]
-//   })
-//   .add({
-//     targets: this.containerRef.current,
-//     opacity: [0, 1],
-//     translateY: [200, 0]
-//   })
-//   .play();
