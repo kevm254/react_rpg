@@ -41,4 +41,6 @@ export default class PlayerStyles {
       overflow: "hidden"
     };
   }
+
+  static getEyeLidStyles() {}
 }
