@@ -13,7 +13,8 @@ export default class DebugState extends Component {
       tiles: [],
       showObstrructions: false,
       playerPos: { x: 0, y: 0 },
-      updatePlayerHP: 0
+      updatePlayerHP: 0,
+      gameOver: false
     };
 
     this.bindAll();
@@ -102,6 +103,7 @@ export default class DebugState extends Component {
     this.updatePlayerPos = this.updatePlayerPos.bind(this);
     this.checkForDamage = this.checkForDamage.bind(this);
     this.resetDamage = this.resetDamage.bind(this);
+    this.showGameOver = this.showGameOver.bind(this);
   }
 
   componentWillMount() {
@@ -162,6 +164,10 @@ export default class DebugState extends Component {
     this.setState({ showObstructions: !this.state.showObstructions });
   }
 
+  showGameOver() {
+    this.setState({ gameOver: true });
+  }
+
   renderUI(state) {
     return (
       <div>
@@ -185,18 +191,21 @@ export default class DebugState extends Component {
         }}
         id="debug_container"
       >
-        <Player
-          playerOffset={{ x: 0, y: 32 }}
-          obstructionMap={this.obstructionMap}
-          updatePlayerPos={this.updatePlayerPos}
-          checkForDamage={this.checkForDamage}
-          resetDamage={this.resetDamage}
-          updatePlayerHP={this.state.updatePlayerHP}
-        />
+        <div style={{ color: "white" }}>{this.state.gameOver.toString()}</div>
+
         <h1>Debug Screen</h1>
         <button onClick={this.toggleObstructionMap}>Toggle Obstructions</button>
-        {this.state.currentHP !== 0 ? (
+        {!this.state.gameOver ? (
           <div id="game_container">
+            <Player
+              playerOffset={{ x: 0, y: 0 }}
+              obstructionMap={this.obstructionMap}
+              updatePlayerPos={this.updatePlayerPos}
+              checkForDamage={this.checkForDamage}
+              resetDamage={this.resetDamage}
+              updatePlayerHP={this.state.updatePlayerHP}
+              showGameOver={this.showGameOver}
+            />
             {this.renderUI(this.state)}
             {this.state.tiles}
           </div>

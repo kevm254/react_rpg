@@ -43,10 +43,10 @@ export default class Player extends Component {
 
   componentDidUpdate(prevProps) {
     if (prevProps.updatePlayerHP !== this.props.updatePlayerHP) {
-      this.updatePlayerHP(-5);
+      this.updatePlayerHP(-10);
       this.props.resetDamage();
       if (this.state.currentHP <= 0) {
-        alert("game finished");
+        this.playGameOverAnim();
       }
     }
   }
@@ -69,6 +69,19 @@ export default class Player extends Component {
 
   setPlayerIsRolling(isRolling: boolean) {
     this.setState({ rollAnimIsPlaying: isRolling });
+  }
+
+  playGameOverAnim() {
+    anime({
+      targets: this.playerRef.current,
+      scale: [1, 2, 1],
+      rotate: "720deg",
+      color: ["blue", "black"],
+      duration: 1500,
+      complete: () => {
+        this.props.showGameOver();
+      }
+    });
   }
   // animate mouth
   setPlayerMouthPos(state: string) {
@@ -311,7 +324,7 @@ export default class Player extends Component {
       <div
         ref={this.playerRef}
         style={{
-          top: 32,
+          top: 0,
           position: "relative",
           height: "64px",
           width: "64px"
