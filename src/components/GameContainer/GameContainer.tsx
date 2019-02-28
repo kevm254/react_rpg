@@ -50,7 +50,7 @@ export default class GameContainer extends Component {
 
   render() {
     return (
-      <div style={{ height: 550, width: 800, overflow: "hidden" }}>
+      <div id="game_container">
         <InputListener>
           {this.getGameState(this.state.currentState)}
         </InputListener>

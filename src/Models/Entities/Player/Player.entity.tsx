@@ -1,7 +1,9 @@
 import React, { Component } from "react";
 import anime from "animejs";
 import PlayerAnims from "./Player.anim";
+import PlayerFace from "./Partials/Face.partial";
 import { Keys } from "../../keys.model";
+import PlayerShadow from "./Partials/Shadow.partial";
 import PlayerStyles from "./Player.styles";
 
 export default class Player extends Component {
@@ -20,9 +22,17 @@ export default class Player extends Component {
       playerPos: { x: 0, y: 0 },
       maxHP: 10,
       currentHP: 10,
+      previousPlayerDirection: null,
       playerDirection: "DOWN",
-      rolled: false
+      rolled: false,
+      rollAnimIsPlaying: false
     };
+    this.bindAll();
+  }
+
+  bindAll() {
+    this.playerIsNotRolling = this.playerIsNotRolling.bind(this);
+    this.updatePlayerHP = this.updatePlayerHP.bind(this);
   }
 
   componentDidMount() {
@@ -31,6 +41,19 @@ export default class Player extends Component {
     this.animateFaceOnInit();
   }
 
+  componentDidUpdate(prevProps) {
+    if (prevProps.updatePlayerHP !== this.props.updatePlayerHP) {
+      this.updatePlayerHP(-5);
+      this.props.resetDamage();
+      if (this.state.currentHP <= 0) {
+        alert("game finished");
+      }
+    }
+  }
+
+  updatePlayerHP(hp: number) {
+    this.setState({ currentHP: this.state.currentHP + hp });
+  }
   initPlayerPos() {
     this.props.startPos
       ? this.setPlayerPos(this.props.startPos)
@@ -44,6 +67,9 @@ export default class Player extends Component {
     this.setState({ playerDirection: direction });
   }
 
+  setPlayerIsRolling(isRolling: boolean) {
+    this.setState({ rollAnimIsPlaying: isRolling });
+  }
   // animate mouth
   setPlayerMouthPos(state: string) {
     switch (state) {
@@ -66,9 +92,17 @@ export default class Player extends Component {
   }
 
   animateFaceOnInit() {
-    PlayerAnims.animateMouth(this.playerMouthRef.current);
-    PlayerAnims.animateLeftPupil();
-    PlayerAnims.animateRightPupil();
+    // PlayerAnims.animateMouth(this.playerMouthRef.current);
+    // PlayerAnims.animateLeftPupil();
+    // PlayerAnims.animateRightPupil();
+  }
+
+  playerIsRolling() {
+    return this.state.rollAnimIsPlaying;
+  }
+
+  playerIsNotRolling() {
+    return this.state.rollAnimIsPlaying === false;
   }
 
   canMove(direction: string) {
@@ -76,7 +110,7 @@ export default class Player extends Component {
       case "LEFT":
         return (
           this.props.obstructionMap[this.state.playerPos.y][
-            this.state.playerXPos - 1
+            this.state.playerPos.x - 1
           ] !== 1 && this.state.playerPos.x > 0
         );
       case "RIGHT":
@@ -96,7 +130,8 @@ export default class Player extends Component {
         return (
           this.props.obstructionMap[this.state.playerPos.y + 1][
             this.state.playerPos.x
-          ] !== 1
+          ] !== 1 &&
+          this.state.playerPos.y < this.props.obstructionMap.length - 1
         );
     }
   }
@@ -106,6 +141,7 @@ export default class Player extends Component {
       // RIGHT
       if (e.keyCode === Keys.RIGHT && this.canMove("RIGHT")) {
         e.preventDefault();
+        this.setPlayerIsRolling(true);
         this.setState({
           playerPos: { ...this.state.playerPos, x: this.state.playerPos.x + 1 }
         });
@@ -113,7 +149,10 @@ export default class Player extends Component {
           targets: this.playerRef.current,
           translateX: 64 * this.state.playerPos.x,
           easing: "easeOutQuad",
-          duration: 300
+          duration: 300,
+          complete: () => {
+            this.setPlayerIsRolling(false);
+          }
         });
 
         this.updatePlayerDirection("RIGHT");
@@ -147,7 +186,10 @@ export default class Player extends Component {
           targets: this.playerRef.current,
           translateX: 64 * this.state.playerPos.x,
           easing: "easeOutCubic",
-          duration: 300
+          duration: 300,
+          complete: () => {
+            this.setPlayerIsRolling(false);
+          }
         });
 
         this.updatePlayerDirection("LEFT");
@@ -180,23 +222,13 @@ export default class Player extends Component {
           targets: this.playerRef.current,
           translateY: 64 * this.state.playerPos.y,
           easing: "easeOutCubic",
-          duration: 300
-        });
-
-        anime({
-          targets: [
-            this.leftEyeRef.current,
-            this.rightEyeRef.current,
-            this.playerMouthRef.current
-          ],
-
-          rotate: "180deg",
-          easing: "linear",
-          duration: 0
+          duration: 300,
+          complete: () => {
+            this.setPlayerIsRolling(false);
+          }
         });
 
         this.updatePlayerDirection("UP");
-        this.setState({ isRolled: !this.state.isRolled });
 
         this.state.isRolled
           ? anime({
@@ -206,9 +238,9 @@ export default class Player extends Component {
                 this.playerMouthRef.current
               ],
 
-              translateY: [-100, 0],
+              translateY: [200, 0],
               easing: "linear",
-              duration: 500
+              duration: 300
             })
           : anime({
               targets: [
@@ -216,10 +248,11 @@ export default class Player extends Component {
                 this.rightEyeRef.current,
                 this.playerMouthRef.current
               ],
-              translateY: [0, 100],
+              translateY: [0, -200],
               easing: "linear",
-              duration: 500
+              duration: 300
             });
+        this.setState({ isRolled: !this.state.isRolled });
 
         this.props.checkForDamage(this.state.playerPos);
       }
@@ -235,11 +268,13 @@ export default class Player extends Component {
           targets: this.playerRef.current,
           translateY: 64 * this.state.playerPos.y,
           easing: "easeOutCubic",
-          duration: 300
+          duration: 300,
+          complete: () => {
+            this.setPlayerIsRolling(false);
+          }
         });
 
         this.updatePlayerDirection("DOWN");
-        this.setState({ isRolled: !this.state.isRolled });
 
         this.state.isRolled
           ? anime({
@@ -251,7 +286,7 @@ export default class Player extends Component {
 
               translateY: [-100, 0],
               easing: "linear",
-              duration: 500
+              duration: 300
             })
           : anime({
               targets: [
@@ -259,11 +294,13 @@ export default class Player extends Component {
                 this.rightEyeRef.current,
                 this.playerMouthRef.current
               ],
+
               translateY: [0, 100],
               easing: "linear",
-              duration: 500
+              duration: 300
             });
 
+        this.setState({ isRolled: !this.state.isRolled });
         this.props.checkForDamage(this.state.playerPos);
       }
     });
@@ -297,151 +334,35 @@ export default class Player extends Component {
             style={PlayerStyles.getTextureStyles()}
           />
           <div className="face" style={{ position: "relative" }}>
-            {(this.state.playerDirection === "UP" ||
-              this.state.playerDirection === "DOWN" ||
-              this.state.playerDirection === "LEFT") && (
-              <div
-                className="player_eye_left"
-                ref={this.leftEyeRef}
-                style={PlayerStyles.getOuterEyeStyles({
+            {this.state.playerDirection !== "RIGHT" &&
+              PlayerFace.getEye({
+                ref: this.leftEyeRef,
+                eyePos: {
                   top: "11px",
                   left: "10px"
-                })}
-              >
-                <div
-                  className="player_left_eye_lid"
-                  style={{
-                    position: "absolute",
-                    top: -44,
-                    left: 0,
-                    height: "17px",
-                    width: "14px",
-                    backgroundColor: "blue",
-                    zIndex: 520
-                  }}
-                />
-                <div
-                  className="player_inner_eye_left"
-                  style={{
-                    position: "relative",
-                    bottom: "-4px",
-                    backgroundColor: "black",
-                    height: "14px",
-                    width: "14px",
-                    borderRadius: "50px"
-                  }}
-                >
-                  <div
-                    className="player_inner_eye_left"
-                    style={{
-                      position: "absolute",
-                      left: "7px",
-                      top: "2px",
-                      backgroundColor: "black",
-                      height: "5px",
-                      width: "5px",
-                      opacity: ".7",
-                      borderRadius: "100px"
-                    }}
-                  />
-                </div>
-              </div>
-            )}
+                }
+              })}
 
-            {(this.state.playerDirection === "UP" ||
-              this.state.playerDirection === "DOWN" ||
-              this.state.playerDirection === "RIGHT") && (
-              <div
-                className="player_eye_right"
-                ref={this.rightEyeRef}
-                style={PlayerStyles.getOuterEyeStyles({
+            {this.state.playerDirection !== "LEFT" &&
+              PlayerFace.getEye({
+                ref: this.rightEyeRef,
+                eyePos: {
                   top: "11px",
                   right: "10px"
-                })}
-              >
-                <div
-                  className="player_right_eye_lid"
-                  style={{
-                    position: "absolute",
-                    top: -44,
-                    left: 0,
-                    height: "17px",
-                    width: "14px",
-                    backgroundColor: "blue",
-                    zIndex: 520
-                  }}
-                />
-                <div
-                  className="player_inner_eye_right"
-                  style={{
-                    position: "relative",
-                    bottom: "-4px",
-                    backgroundColor: "black",
-                    height: "14px",
-                    width: "14px",
-                    borderRadius: "50px"
-                  }}
-                >
-                  <div
-                    className="player_inner_eye_left"
-                    style={{
-                      position: "absolute",
-                      left: "7px",
-                      top: "2px",
-                      backgroundColor: "black",
-                      height: "5px",
-                      width: "5px",
-                      opacity: ".7",
-                      borderRadius: "100px"
-                    }}
-                  />
-                </div>
-              </div>
-            )}
+                },
+                playerDirection: this.state.playerDirection,
+                isRolled: this.state.isRolled,
+                eyeSide: "right"
+              })}
 
-            <div
-              className="player_mouth"
-              style={{
-                backgroundColor: "black",
-                borderRadius: "50px",
-                height: "10px",
-                width: "25px",
-                position: "absolute",
-                top: "37px",
-                right: this.setPlayerMouthPos(this.state.playerDirection),
-                border: "2px solid black"
-              }}
-              ref={this.playerMouthRef}
-            >
-              <div
-                className="player_inner_mouth"
-                style={{
-                  height: "5px",
-                  width: "10px",
-                  borderRadius: "20px",
-                  backgroundColor: "red",
-                  position: "relative",
-                  left: "7px",
-                  top: "5px"
-                }}
-              />
-            </div>
+            {PlayerFace.getMouth({
+              ref: this.playerMouthRef,
+              playerDirection: this.state.playerDirection,
+              isRolled: this.state.isRolled
+            })}
           </div>
         </div>
-        <div
-          className="player_shadow"
-          style={{
-            position: "absolute",
-            backgroundColor: "black",
-            borderRadius: "190px",
-            height: "14px",
-            width: "55px",
-            left: "0px",
-            opacity: ".4",
-            top: "115px",
-            zIndex: 0
-          }}
-        />
+        {PlayerShadow.getPlayerShadow()}
       </div>
     );
   }

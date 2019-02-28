@@ -1,3 +1,10 @@
+interface Position {
+  top?: string | number;
+  bottom?: string | number;
+  left?: string | number;
+  right?: string | number;
+}
+
 export default class PlayerStyles {
   static getBodyStyles() {
     return {
@@ -24,23 +31,28 @@ export default class PlayerStyles {
     };
   }
 
-  static getOuterEyeStyles(eyePos: {
-    left?: number | string;
-    right?: number | string;
-    top?: number | string;
-    bottom?: number | string;
-  }) {
+  static getOuterEyeStyles(styleData: Position) {
     return {
-      ...eyePos,
+      ...styleData,
       borderRadius: "50px",
       height: "17px",
+      overflow: "hidden",
       width: "14px",
       position: "absolute",
       border: "1px solid black",
-      backgroundColor: "white",
-      overflow: "hidden"
+      backgroundColor: "white"
     };
   }
 
-  static getEyeLidStyles() {}
+  static getEyeLidStyles(lidPos: Position) {
+    return {
+      position: "absolute",
+      top: "-17px",
+      height: "17px",
+      width: "14px",
+      borderRadius: "100px",
+      backgroundColor: "blue",
+      zIndex: 520
+    };
+  }
 }
