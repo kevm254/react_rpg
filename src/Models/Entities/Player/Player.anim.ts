@@ -44,6 +44,28 @@ export default class PlayerAnims {
     });
   }
 
+  // move Player
+  static rollRight(data: { targets; playerXPos; onComplete }) {
+    return anime({
+      targets: data.targets,
+      translateX: 64 * data.playerXPos,
+      easing: "easeOutQuad",
+      duration: 300,
+      complete: data.onComplete
+    });
+  }
+
+  static rollUp(data: { targets; playerYPos; onComplete }) {
+    return anime({
+      targets: data.targets,
+      translateY: 64 * data.playerYPos,
+      easing: "easeOutCubic",
+      duration: 300,
+      complete: data.onComplete
+    });
+  }
+
+  // roll animation
   static rollPlayer1(ref) {
     anime({
       targets: ref,

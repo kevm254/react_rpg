@@ -6,6 +6,15 @@ interface Position {
 }
 
 export default class PlayerStyles {
+  static getContainerStyles() {
+    return {
+      top: 0,
+      position: "relative",
+      height: "64px",
+      width: "64px"
+    };
+  }
+
   static getBodyStyles() {
     return {
       height: "64px",

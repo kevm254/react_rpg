@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import anime from "animejs";
 import PlayerAnims from "./Player.anim";
 import PlayerFace from "./Partials/Face.partial";
-import Modal from "../../../components/Modal/Modal";
-import { Keys } from "../../keys.model";
+import TextBubble from "../../../components/TextBubble/TextBubble";
+import { Keys, KeyPressed } from "../../keys.model";
 import PlayerShadow from "./Partials/Shadow.partial";
 import PlayerStyles from "./Player.styles";
 
@@ -27,7 +27,8 @@ export default class Player extends Component {
       previousPlayerDirection: null,
       playerDirection: "DOWN",
       rolled: false,
-      rollAnimIsPlaying: false
+      rollAnimIsPlaying: false,
+      displayTextBubble: false
     };
     this.bindAll();
   }
@@ -35,6 +36,7 @@ export default class Player extends Component {
   bindAll() {
     this.playerIsNotRolling = this.playerIsNotRolling.bind(this);
     this.updatePlayerHP = this.updatePlayerHP.bind(this);
+    this.closeTextBubble = this.closeTextBubble.bind(this);
   }
 
   componentDidMount() {
@@ -42,6 +44,7 @@ export default class Player extends Component {
     this.setupKeyListeners();
     this.animateFaceOnInit();
     this.storeFacialFeatureRefs();
+    this.displayText();
   }
 
   storeFacialFeatureRefs() {
@@ -50,6 +53,10 @@ export default class Player extends Component {
       this.rightEyeRef.current,
       this.playerMouthRef.current
     ];
+  }
+
+  displayText() {
+    this.openTextBubble();
   }
 
   componentDidUpdate(prevProps) {
@@ -65,6 +72,7 @@ export default class Player extends Component {
   updatePlayerHP(hp: number) {
     this.setState({ currentHP: this.state.currentHP + hp });
   }
+
   initPlayerPos() {
     this.props.startPos
       ? this.setPlayerPos(this.props.startPos)
@@ -74,6 +82,7 @@ export default class Player extends Component {
   setPlayerPos(pos: { x: number; y: number }) {
     this.setState({ playerPos: pos });
   }
+
   updatePlayerDirection(direction: string) {
     this.setState({ playerDirection: direction });
   }
@@ -84,6 +93,25 @@ export default class Player extends Component {
 
   setPreviousPlayerDirection(direction: string) {
     this.setState({ previousPlayerDirection: direction });
+  }
+
+  openTextBubble() {
+    this.setState({ displayTextBubble: true });
+  }
+
+  closeTextBubble(data: string) {
+    this.setState({ displayTextBubble: false });
+  }
+
+  displayTextBubble(state) {
+    return (
+      state.displayTextBubble && (
+        <TextBubble
+          text={"passed in text"}
+          closeTextBubble={this.closeTextBubble}
+        />
+      )
+    );
   }
 
   playGameOverAnim() {
@@ -121,7 +149,7 @@ export default class Player extends Component {
 
   animateFaceOnInit() {
     // PlayerAnims.animateMouth(this.playerMouthRef.current);
-    // PlayerAnims.animateLeftPupil();
+    // PlayerAnims.animateLeftPupil( );
     // PlayerAnims.animateRightPupil();
   }
 
@@ -164,201 +192,201 @@ export default class Player extends Component {
     }
   }
 
+  rollRight() {
+    this.setState({ isRolled: !this.state.isRolled });
+    this.updatePlayerDirection("RIGHT");
+    this.state.isRolled
+      ? anime({
+          targets: this.innerPlayerRef.current,
+          rotate: [0, 180],
+          easing: "easeOutQuad",
+          duration: 350
+        })
+      : anime({
+          targets: this.innerPlayerRef.current,
+          rotate: [180, 360],
+          easing: "easeOutQuad",
+          duration: 350
+        });
+  }
+
+  moveRight() {
+    if (this.canMove("RIGHT")) {
+      this.setState({
+        playerPos: {
+          ...this.state.playerPos,
+          x: this.state.playerPos.x + 1
+        }
+      });
+      PlayerAnims.rollRight({
+        targets: this.playerRef.current,
+        playerXPos: this.state.playerPos.x
+      });
+    }
+  }
+
+  moveLeft() {
+    if (this.canMove("LEFT")) {
+      this.setState({
+        playerPos: {
+          ...this.state.playerPos,
+          x: this.state.playerPos.x - 1
+        }
+      });
+      anime({
+        targets: this.playerRef.current,
+        translateX: 64 * this.state.playerPos.x,
+        easing: "easeOutCubic",
+        duration: 300,
+        complete: () => {
+          this.setPlayerIsRolling(false);
+        }
+      });
+    }
+  }
+
+  moveUp() {
+    if (this.canMove("UP")) {
+      this.setState({
+        playerPos: { ...this.state.playerPos, y: this.state.playerPos.y - 1 }
+      });
+      PlayerAnims.rollUp({
+        targets: this.playerRef.current,
+        playerYPos: this.state.playerPos.y
+      });
+    }
+  }
+
+  rollLeft() {
+    this.setState({ isRolled: !this.state.isRolled });
+    this.updatePlayerDirection("LEFT");
+
+    this.state.isRolled
+      ? anime({
+          targets: this.innerPlayerRef.current,
+          rotate: [360, 180],
+          easing: "easeOutQuad",
+          duration: 350
+        })
+      : anime({
+          targets: this.innerPlayerRef.current,
+          rotate: [180, 0],
+          easing: "easeOutQuad",
+          duration: 350
+        });
+  }
+
+  rollUp() {
+    this.setState({ isRolled: !this.state.isRolled });
+    this.updatePlayerDirection("UP");
+
+    this.state.isRolled
+      ? anime({
+          targets: [
+            this.leftEyeRef.current,
+            this.rightEyeRef.current,
+            this.playerMouthRef.current
+          ],
+
+          translateY: [200, 0],
+          easing: "linear",
+          duration: 300
+        })
+      : anime({
+          targets: [
+            this.leftEyeRef.current,
+            this.rightEyeRef.current,
+            this.playerMouthRef.current
+          ],
+          translateY: [0, -200],
+          easing: "linear",
+          duration: 300
+        });
+  }
+
+  moveDown() {
+    if (this.canMove("DOWN")) {
+      this.setState({
+        playerPos: {
+          ...this.state.playerPos,
+          y: this.state.playerPos.y + 1
+        }
+      });
+      anime({
+        targets: this.playerRef.current,
+        translateY: 64 * this.state.playerPos.y,
+        easing: "easeOutCubic",
+        duration: 300,
+        complete: () => {
+          this.setPlayerIsRolling(false);
+        }
+      });
+    }
+  }
+
+  rollDown() {
+    this.setState({ isRolled: !this.state.isRolled });
+    this.updatePlayerDirection("DOWN");
+
+    this.state.isRolled
+      ? PlayerAnims.rollDown1([
+          this.leftEyeRef.current,
+          this.rightEyeRef.current,
+          this.playerMouthRef.current
+        ])
+      : PlayerAnims.rollDown2([
+          this.leftEyeRef.current,
+          this.rightEyeRef.current,
+          this.playerMouthRef.current
+        ]);
+  }
+
+  preventScrolling(e) {
+    e.preventDefault();
+  }
+
+  checkForDamage(state) {
+    this.props.checkForDamage(state.playerPos);
+  }
+
   setupKeyListeners() {
     document.body.addEventListener("keydown", e => {
       // RIGHT
-      if (e.keyCode === Keys.RIGHT && this.canMove("RIGHT")) {
-        e.preventDefault();
-        this.setPlayerIsRolling(true);
-        this.setState({
-          playerPos: { ...this.state.playerPos, x: this.state.playerPos.x + 1 }
-        });
-        anime({
-          targets: this.playerRef.current,
-          translateX: 64 * this.state.playerPos.x,
-          easing: "easeOutQuad",
-          duration: 300,
-          complete: () => {
-            this.setPlayerIsRolling(false);
-          }
-        });
-
-        this.updatePlayerDirection("RIGHT");
-
-        this.setState({ isRolled: !this.state.isRolled });
-
-        this.state.isRolled
-          ? anime({
-              targets: this.innerPlayerRef.current,
-              rotate: [0, 180],
-              easing: "easeOutQuad",
-              duration: 350
-            })
-          : anime({
-              targets: this.innerPlayerRef.current,
-              rotate: [180, 360],
-              easing: "easeOutQuad",
-              duration: 350
-            });
-
-        this.props.checkForDamage(this.state.playerPos);
+      if (KeyPressed.right(e)) {
+        this.preventScrolling(e);
+        this.rollRight();
+        this.moveRight();
+        this.checkForDamage(this.state);
       }
 
-      if (e.keyCode === Keys.LEFT && this.canMove("LEFT")) {
-        e.preventDefault();
-        this.setState({
-          playerPos: { ...this.state.playerPos, x: this.state.playerPos.x - 1 }
-        });
-
-        anime({
-          targets: this.playerRef.current,
-          translateX: 64 * this.state.playerPos.x,
-          easing: "easeOutCubic",
-          duration: 300,
-          complete: () => {
-            this.setPlayerIsRolling(false);
-          }
-        });
-
-        this.updatePlayerDirection("LEFT");
-
-        this.setState({ isRolled: !this.state.isRolled });
-
-        this.state.isRolled
-          ? anime({
-              targets: this.innerPlayerRef.current,
-              rotate: [360, 180],
-              easing: "easeOutQuad",
-              duration: 350
-            })
-          : anime({
-              targets: this.innerPlayerRef.current,
-              rotate: [180, 0],
-              easing: "easeOutQuad",
-              duration: 350
-            });
-
-        this.props.checkForDamage(this.state.playerPos);
+      if (KeyPressed.left(e)) {
+        this.preventScrolling(e);
+        this.rollLeft();
+        this.moveLeft();
+        this.checkForDamage(this.state);
       }
 
-      if (e.keyCode === Keys.UP && this.canMove("UP")) {
-        e.preventDefault();
-        this.setState({
-          playerPos: { ...this.state.playerPos, y: this.state.playerPos.y - 1 }
-        });
-        anime({
-          targets: this.playerRef.current,
-          translateY: 64 * this.state.playerPos.y,
-          easing: "easeOutCubic",
-          duration: 300,
-          complete: () => {
-            this.setPlayerIsRolling(false);
-          }
-        });
-
-        // if (this.state.playerDirection === "LEFT" && this.state.isRolled) {
-        // anime({
-        //   targets: [
-        //     this.leftEyeRef.current,
-        //     // this.rightEyeRef.current,
-        //     this.playerMouthRef.current
-        //   ],
-
-        //   translateY: [0, -200],
-        //   easing: "linear",
-        //   duration: 300
-        // });
-        // } else {
-        this.state.isRolled
-          ? anime({
-              targets: [
-                this.leftEyeRef.current,
-                this.rightEyeRef.current,
-                this.playerMouthRef.current
-              ],
-
-              translateY: [200, 0],
-              easing: "linear",
-              duration: 300
-            })
-          : anime({
-              targets: [
-                this.leftEyeRef.current,
-                this.rightEyeRef.current,
-                this.playerMouthRef.current
-              ],
-              translateY: [0, -200],
-              easing: "linear",
-              duration: 300
-            });
-        // }
-        this.updatePlayerDirection("UP");
-
-        this.setState({ isRolled: !this.state.isRolled });
-
-        this.props.checkForDamage(this.state.playerPos);
+      if (KeyPressed.up(e)) {
+        this.preventScrolling(e);
+        this.rollUp();
+        this.moveUp();
+        this.checkForDamage(this.state);
       }
 
-      if (e.keyCode === Keys.DOWN && this.canMove("DOWN")) {
-        this.setState({
-          playerPos: {
-            ...this.state.playerPos,
-            y: this.state.playerPos.y + 1
-          }
-        });
-        anime({
-          targets: this.playerRef.current,
-          translateY: 64 * this.state.playerPos.y,
-          easing: "easeOutCubic",
-          duration: 300,
-          complete: () => {
-            this.setPlayerIsRolling(false);
-          }
-        });
-
-        this.updatePlayerDirection("DOWN");
-
-        this.state.isRolled
-          ? PlayerAnims.rollDown1([
-              this.leftEyeRef.current,
-              this.rightEyeRef.current,
-              this.playerMouthRef.current
-            ])
-          : PlayerAnims.rollDown2([
-              this.leftEyeRef.current,
-              this.rightEyeRef.current,
-              this.playerMouthRef.current
-            ]);
-
-        this.setState({ isRolled: !this.state.isRolled });
-        this.props.checkForDamage(this.state.playerPos);
+      if (KeyPressed.down(e)) {
+        this.preventScrolling(e);
+        this.rollDown();
+        this.moveDown();
+        this.checkForDamage(this.state);
       }
     });
   }
 
   render() {
     return (
-      <div
-        ref={this.playerRef}
-        style={{
-          top: 0,
-          position: "relative",
-          height: "64px",
-          width: "64px"
-        }}
-      >
-        <Modal />
-        <div
-          className={"debug"}
-          style={{
-            position: "fixed",
-            color: "white",
-            zIndex: 400,
-            backgroundColor: "darkblue"
-          }}
-        >
-          {/*JSON.stringify(this.state) */}
-        </div>
+      <div ref={this.playerRef} style={PlayerStyles.getContainerStyles()}>
+        {this.displayTextBubble(this.state)}
+
         <div ref={this.innerPlayerRef} style={PlayerStyles.getBodyStyles()}>
           <img
             src={"./img/player_texture.png"}
