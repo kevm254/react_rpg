@@ -60,4 +60,22 @@ export default class PlayerAnims {
       duration: 350
     });
   }
+
+  static rollDown1(refs) {
+    return anime({
+      targets: refs,
+      translateY: [-100, 0],
+      easing: "linear",
+      duration: 300
+    });
+  }
+
+  static rollDown2(refs) {
+    return anime({
+      targets: refs,
+      translateY: [0, 100],
+      easing: "linear",
+      duration: 300
+    });
+  }
 }

@@ -2,10 +2,20 @@ import React, { Component } from "react";
 import TextBox from "../../components/UI/TextBox/TextBox";
 import Tile from "../../components/Tile/Tilemap/Tile.component";
 import Player from "../../Models/Entities/Player/Player.entity";
+
+import LevelData from "./level1";
 import anime from "animejs";
 import { Keys } from "../../Models/keys.model";
 
 export default class DebugState extends Component {
+  data;
+  itemMap;
+  lightMap;
+  obstructionMap;
+  damageMap;
+  tiles = [];
+
+  // CONSTRUCTOR ///////////////
   constructor(props) {
     super(props);
 
@@ -14,88 +24,14 @@ export default class DebugState extends Component {
       showObstrructions: false,
       playerPos: { x: 0, y: 0 },
       updatePlayerHP: 0,
-      gameOver: false
+      gameOver: false,
+      playerTop: 0,
+      playerLeft: 0
     };
 
     this.bindAll();
+    this.initMaps();
   }
-
-  data = [
-    [2, 3, 1, 5, 1, 1, 1, 2, 1, 1],
-    [2, 3, 3, 5, 4, 4, 4, 4, 4, 1],
-    [2, 2, 2, 2, 2, 2, 1, 2, 4, 1],
-    [1, 1, 1, 1, 1, 1, 1, 2, 1, 1],
-    [3, 3, 3, 3, 3, 2, 1, 2, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, 2, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, 2, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, 2, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, 2, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, 2, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, 2, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, 2, 1, 1]
-  ];
-
-  itemMap = [
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-
-  lightMap = [
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-
-  obstructionMap = [
-    [0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 1, 1, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-
-  damageMap = [
-    [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 1, 1, 1, 1, 1, 1, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-  ];
-
-  tiles = [];
 
   bindAll() {
     this.restartGame = this.restartGame.bind(this);
@@ -106,9 +42,22 @@ export default class DebugState extends Component {
     this.showGameOver = this.showGameOver.bind(this);
   }
 
+  initMaps() {
+    this.data = LevelData.getMapData();
+    this.itemMap = LevelData.getItemMapData();
+    this.lightMap = LevelData.getLightMapData();
+    this.obstructionMap = LevelData.getObstructionMap();
+    this.damageMap = LevelData.getDamageMap();
+  }
+
+  // LIFE -CYCLE METHODS /////////////
   componentWillMount() {
     this.renderRow(this.data);
   }
+
+  componentDidMount() {}
+
+  // GENERAL METHODS ///////////////
 
   updatePlayerPos(pos: { x: number; y: number }) {
     this.setState({ playerPos: pos });
@@ -125,7 +74,7 @@ export default class DebugState extends Component {
     this.setState({ updatePlayerHP: 0 });
   }
 
-  renderRow(dataSource: [], row: boolean) {
+  renderRow(dataSource: []) {
     dataSource.map((row, i) => {
       let currentRow = i;
 
@@ -181,6 +130,21 @@ export default class DebugState extends Component {
     );
   }
 
+  displayPlayer() {
+    return (
+      <Player
+        playerOffset={{ x: 0, y: 0 }}
+        obstructionMap={this.obstructionMap}
+        updatePlayerPos={this.updatePlayerPos}
+        checkForDamage={this.checkForDamage}
+        resetDamage={this.resetDamage}
+        updatePlayerHP={this.state.updatePlayerHP}
+        showGameOver={this.showGameOver}
+      />
+    );
+  }
+
+  // RENDER ///////////////////
   render() {
     return (
       <div
@@ -195,17 +159,10 @@ export default class DebugState extends Component {
 
         <h1>Debug Screen</h1>
         <button onClick={this.toggleObstructionMap}>Toggle Obstructions</button>
+
         {!this.state.gameOver ? (
           <div id="game_container">
-            <Player
-              playerOffset={{ x: 0, y: 0 }}
-              obstructionMap={this.obstructionMap}
-              updatePlayerPos={this.updatePlayerPos}
-              checkForDamage={this.checkForDamage}
-              resetDamage={this.resetDamage}
-              updatePlayerHP={this.state.updatePlayerHP}
-              showGameOver={this.showGameOver}
-            />
+            {this.displayPlayer()}
             {this.renderUI(this.state)}
             {this.state.tiles}
           </div>

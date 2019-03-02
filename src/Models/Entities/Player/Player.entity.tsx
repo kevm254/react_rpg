@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import anime from "animejs";
 import PlayerAnims from "./Player.anim";
 import PlayerFace from "./Partials/Face.partial";
+import Modal from "../../../components/Modal/Modal";
 import { Keys } from "../../keys.model";
 import PlayerShadow from "./Partials/Shadow.partial";
 import PlayerStyles from "./Player.styles";
@@ -13,6 +14,7 @@ export default class Player extends Component {
   playerMouthRef = React.createRef();
   leftEyeRef = React.createRef();
   rightEyeRef = React.createRef();
+  facialFeatureRefs = [];
 
   // constructor
   constructor(props) {
@@ -39,6 +41,15 @@ export default class Player extends Component {
     this.initPlayerPos();
     this.setupKeyListeners();
     this.animateFaceOnInit();
+    this.storeFacialFeatureRefs();
+  }
+
+  storeFacialFeatureRefs() {
+    this.facialFeatureRefs = [
+      this.leftEyeRef.current,
+      this.rightEyeRef.current,
+      this.playerMouthRef.current
+    ];
   }
 
   componentDidUpdate(prevProps) {
@@ -69,6 +80,10 @@ export default class Player extends Component {
 
   setPlayerIsRolling(isRolling: boolean) {
     this.setState({ rollAnimIsPlaying: isRolling });
+  }
+
+  setPreviousPlayerDirection(direction: string) {
+    this.setState({ previousPlayerDirection: direction });
   }
 
   playGameOverAnim() {
@@ -241,8 +256,19 @@ export default class Player extends Component {
           }
         });
 
-        this.updatePlayerDirection("UP");
+        // if (this.state.playerDirection === "LEFT" && this.state.isRolled) {
+        // anime({
+        //   targets: [
+        //     this.leftEyeRef.current,
+        //     // this.rightEyeRef.current,
+        //     this.playerMouthRef.current
+        //   ],
 
+        //   translateY: [0, -200],
+        //   easing: "linear",
+        //   duration: 300
+        // });
+        // } else {
         this.state.isRolled
           ? anime({
               targets: [
@@ -265,6 +291,9 @@ export default class Player extends Component {
               easing: "linear",
               duration: 300
             });
+        // }
+        this.updatePlayerDirection("UP");
+
         this.setState({ isRolled: !this.state.isRolled });
 
         this.props.checkForDamage(this.state.playerPos);
@@ -290,28 +319,16 @@ export default class Player extends Component {
         this.updatePlayerDirection("DOWN");
 
         this.state.isRolled
-          ? anime({
-              targets: [
-                this.leftEyeRef.current,
-                this.rightEyeRef.current,
-                this.playerMouthRef.current
-              ],
-
-              translateY: [-100, 0],
-              easing: "linear",
-              duration: 300
-            })
-          : anime({
-              targets: [
-                this.leftEyeRef.current,
-                this.rightEyeRef.current,
-                this.playerMouthRef.current
-              ],
-
-              translateY: [0, 100],
-              easing: "linear",
-              duration: 300
-            });
+          ? PlayerAnims.rollDown1([
+              this.leftEyeRef.current,
+              this.rightEyeRef.current,
+              this.playerMouthRef.current
+            ])
+          : PlayerAnims.rollDown2([
+              this.leftEyeRef.current,
+              this.rightEyeRef.current,
+              this.playerMouthRef.current
+            ]);
 
         this.setState({ isRolled: !this.state.isRolled });
         this.props.checkForDamage(this.state.playerPos);
@@ -330,6 +347,7 @@ export default class Player extends Component {
           width: "64px"
         }}
       >
+        <Modal />
         <div
           className={"debug"}
           style={{
