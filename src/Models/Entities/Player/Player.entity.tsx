@@ -16,7 +16,7 @@ export default class Player extends Component {
   rightEyeRef = React.createRef();
   facialFeatureRefs = [];
 
-  // constructor
+  // Constructor //////////////////////////////////
   constructor(props) {
     super(props);
 
@@ -39,6 +39,9 @@ export default class Player extends Component {
     this.closeTextBubble = this.closeTextBubble.bind(this);
   }
 
+  // END Constructor //////////////////////////////////
+
+  // Life-Cycle Methods /////////////////////////////////
   componentDidMount() {
     this.initPlayerPos();
     this.setupKeyListeners();
@@ -46,6 +49,17 @@ export default class Player extends Component {
     this.storeFacialFeatureRefs();
     this.displayText();
   }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.updatePlayerHP !== this.props.updatePlayerHP) {
+      this.updatePlayerHP(-10);
+      this.props.resetDamage();
+      if (this.state.currentHP <= 0) {
+        this.playGameOverAnim();
+      }
+    }
+  }
+  // END Life-Cycle Methods //////////////////////////////
 
   storeFacialFeatureRefs() {
     this.facialFeatureRefs = [
@@ -57,16 +71,6 @@ export default class Player extends Component {
 
   displayText() {
     this.openTextBubble();
-  }
-
-  componentDidUpdate(prevProps) {
-    if (prevProps.updatePlayerHP !== this.props.updatePlayerHP) {
-      this.updatePlayerHP(-10);
-      this.props.resetDamage();
-      if (this.state.currentHP <= 0) {
-        this.playGameOverAnim();
-      }
-    }
   }
 
   updatePlayerHP(hp: number) {
