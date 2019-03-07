@@ -12,11 +12,13 @@ export default class Tilemap extends Component {
       case 2:
         return "./img/dirt.png";
       case 3:
-        return "./img/boulder.png";
+        return "./img/tiles/boulder.png";
       case 4:
         return "./img/lava.png";
       case 5:
         return "./img/lava-left.png";
+      case 7:
+        return "./img/tiles/wall.png";
     }
   }
 

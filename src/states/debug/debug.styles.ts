@@ -12,7 +12,6 @@ export default class DebugStyles {
       display: "flex",
       alignItems: "center",
       bottom: "40px",
-      backgroundColor: "rgba(0, 0, 0, .5)",
       height: "50px",
       width: "400px"
     };

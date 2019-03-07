@@ -26,16 +26,18 @@ export default class DebugState extends Component {
       tiles2: [],
       tiles2Matrix: [],
       items: [],
-      itemsMatrix: "hi",
+      itemsMatrix: [],
+      obstructionsMatrix: [],
       events: [],
-      showObstructions: true,
+      showObstructions: false,
       playerPos: null,
       updatePlayerHP: 0,
       playerHP: { current: 2, max: 2 },
       gameOver: false,
       playerTop: 0,
       playerLeft: 0,
-      currentEvent: null
+      currentEvent: null,
+      inventory: { key: false }
     };
 
     this.bindAll();
@@ -52,6 +54,7 @@ export default class DebugState extends Component {
     this.showGameOver = this.showGameOver.bind(this);
     this.renderTileRow = this.renderTileRow.bind(this);
     this.initEventLayer = this.initEventLayer.bind(this);
+    this.initMaps = this.initMaps.bind(this);
   }
 
   initMaps() {
@@ -62,16 +65,24 @@ export default class DebugState extends Component {
 
   // LIFE -CYCLE METHODS /////////////
   componentWillMount() {
-    let tiles = this.renderTileRow(LevelData.getTileData(), this.state);
-    this.setState({ tiles: tiles });
+    this.setState({ obstructionsMatrix: LevelData.getObstructionMap() }, () => {
+      console.log("after update", this.state);
+      let tiles = this.renderTileRow(LevelData.getTileData(), this.state);
+      this.setState({ tilesMatrix: LevelData.getTileData() });
+      this.setState({ tiles: tiles });
+      let tiles2 = this.renderTileRow(LevelData.getTileData2(), this.state);
+      this.setState({ tiles2Matrix: LevelData.getTileData2() });
+      this.setState({ tiles2: tiles2 });
 
-    let tiles2 = this.renderTileRow(LevelData.getTileData2(), this.state);
-    this.setState({ tiles2: tiles2 });
+      let items = this.renderItemRow(LevelData.getItemMapData(), this.state);
+      this.setState({ items: items });
 
-    let items = this.renderItemRow(LevelData.getItemMapData(), this.state);
-    this.setState({ items: items });
+      this.initEventLayer(LevelData.getEventMap());
+    });
+  }
 
-    this.initEventLayer(LevelData.getEventMap());
+  componentDidMount() {
+    console.log("component", this.state);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -98,8 +109,7 @@ export default class DebugState extends Component {
     ];
 
     if (currEvent.toString() === "1") {
-      // alert(" you received the key!");
-
+      // update items
       let arr = [
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -116,12 +126,50 @@ export default class DebugState extends Component {
       ];
 
       let items = this.renderItemRow(arr, this.state);
+      // update items tile layer
       this.setState({ items: items });
+      // add key to inventory
+      this.updateInventory({ key: true });
     }
+    if (currEvent.toString() === "2") {
+      if (this.state.inventory.key === true) {
+        let obstruction = this.updateMatrix(
+          this.state.obstructionsMatrix,
+          8,
+          3,
+          0
+        );
+        this.setState({ obstructionsMatrix: obstruction }, () => {
+          let tiles = this.updateMatrix(this.state.tilesMatrix, 8, 3, 1);
+          this.setState({ tilesMatrix: tiles });
+          let updatedTiles = this.renderTileRow(
+            this.state.tilesMatrix,
+            this.state
+          );
+
+          this.setState({ tiles: updatedTiles });
+        });
+      }
+    }
+  }
+
+  updateMatrix(matrix, x, y, val) {
+    let vals = [...matrix];
+
+    vals[y][x] = val;
+    return vals;
+  }
+
+  updateItemLayer(data: { pos: { x; y }; val: number }) {
+    let currentState = this.state.items;
   }
 
   initEventLayer(layer: any) {
     this.setState({ events: layer });
+  }
+
+  updateInventory(newState) {
+    this.setState({ inventory: newState });
   }
 
   resetDamage() {
@@ -129,6 +177,7 @@ export default class DebugState extends Component {
   }
 
   renderTileRow(dataSource: [], state: any) {
+    console.log("what is state", this.state);
     let tileArray = [];
 
     dataSource.map((row: [], i) => {
@@ -136,13 +185,16 @@ export default class DebugState extends Component {
 
       tileArray.push(
         row.map((item, i) => {
+          console.log("ayyy", this.state.obstructionsMatrix[3][8]);
           return (
             <Tile
               tileNo={item}
               showBorder={false}
               brightness={this.lightMap[currentRow][i]}
               showObsLayer={
-                state.showObstructions ? this.obstructionMap[currentRow][i] : 0
+                state.showObstructions
+                  ? this.state.obstructionsMatrix[currentRow][i]
+                  : 0
               }
             />
           );
@@ -205,7 +257,7 @@ export default class DebugState extends Component {
     return (
       <Player
         playerOffset={{ x: 0, y: 0 }}
-        obstructionMap={this.obstructionMap}
+        obstructionMap={this.state.obstructionsMatrix}
         updatePlayerPos={this.updatePlayerPos}
         checkForDamage={this.checkForDamage}
         checkForEvent={this.checkForEvent}
@@ -226,7 +278,6 @@ export default class DebugState extends Component {
         <div key={idx} style={{ position: "absolute", top: 0, left: 0 }}>
           {layer.map(row => {
             row.push(<br />);
-
             return row;
           })}
         </div>
