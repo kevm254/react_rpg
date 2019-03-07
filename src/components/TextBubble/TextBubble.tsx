@@ -10,6 +10,7 @@ export default class TextBubble extends Component {
   currentText: string = "";
   currentTextPos: number = 0;
 
+  // Constructor ///////////////////////////////////////////
   constructor(props) {
     super(props);
     this.state = {
@@ -22,7 +23,9 @@ export default class TextBubble extends Component {
   bindAll() {
     this.closeTextBubble = this.closeTextBubble.bind(this);
   }
+  // END Constructor ////////////////////////////////////////
 
+  // Life-Cycle Methods ///////////////////////////////////
   componentWillMount() {
     this.updateTextQueue(this.props.text);
     let currentText = this.state.text;
@@ -34,7 +37,9 @@ export default class TextBubble extends Component {
     this.animateWords();
     this.setState({ displayedText: "what's going on?" });
   }
+  // END Life-Cycle Methods ////////////////////////////////
 
+  // General Methods ///////////////////////////////////////
   animateWords() {
     TextBubbleAnims.slideTextIn({
       targets: this.currentTextContainerRef.current
@@ -65,33 +70,56 @@ export default class TextBubble extends Component {
       onComplete: this.props.closeTextBubble
     });
   }
+  // END General Methods ////////////////////////////////////
 
+  // Display Components //////////////////////////
+  displayMask() {
+    return (
+      <div
+        className="modal_mask"
+        style={TextBubbleStyles.getTextBubbleMaskStyles()}
+      />
+    );
+  }
+
+  displayTextArea(state) {
+    return (
+      <div
+        className="modal_text_area"
+        style={TextBubbleStyles.getTextBubbleTextAreaStyles()}
+      >
+        <div
+          className="current_text_container"
+          ref={this.currentTextContainerRef}
+        >
+          {state.displayedText}
+        </div>
+      </div>
+    );
+  }
+
+  displayModalTail() {
+    return (
+      <div
+        className="modal_tail"
+        style={TextBubbleStyles.getTextBubbleTailStyles()}
+      />
+    );
+  }
+  // END Display Components ///////////////////////
+
+  // Render Method ////////////////////////////////
   render() {
     return (
       <div
         style={TextBubbleStyles.getTextBubbleContainerStyles()}
         ref={this.textBubbleRef}
       >
-        <div
-          className="modal_mask"
-          style={TextBubbleStyles.getTextBubbleMaskStyles()}
-        />
-        <div
-          className="modal_text_area"
-          style={TextBubbleStyles.getTextBubbleTextAreaStyles()}
-        >
-          <div
-            className="current_text_container"
-            ref={this.currentTextContainerRef}
-          >
-            {this.state.displayedText}
-          </div>
-        </div>
-        <div
-          className="modal_tail"
-          style={TextBubbleStyles.getTextBubbleTailStyles()}
-        />
+        {this.displayMask()}
+        {this.displayTextArea(this.state)}
+        {this.displayModalTail()}
       </div>
     );
   }
+  // END Render Method /////////////////////////////
 }

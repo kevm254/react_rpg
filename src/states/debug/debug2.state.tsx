@@ -1,26 +1,37 @@
 import React, { Component } from "react";
-import Player from "../../Models/Entities/Player/Player.entity";
+import {
+  BrowserRouter as Router,
+  Route,
+  Link,
+  Redirect,
+  withRouter
+} from "react-router-dom";
+
+function AuthExample() {
+  return (
+    <Router>
+      <div>
+        <AuthButton />
+        <ul>
+          <li>
+            <Link to="/public">Public Page</Link>
+          </li>
+          <li>
+            <Link to="/protected">Protected Page</Link>
+          </li>
+        </ul>
+        <Route path="/public" component={Test} />
+      </div>
+    </Router>
+  );
+}
+
+function Test() {
+  return <div>This is a test component</div>;
+}
 
 export default class Debug2 extends Component {
-  constructor(props) {
-    super(props);
-  }
-
-  canMove() {
-    return true;
-  }
-
-  checkForDamage() {}
-
   render() {
-    return (
-      <div
-        style={{
-          color: "white"
-        }}
-      >
-        <Player canMove={this.canMove} checkForDamage={this.checkForDamage} />
-      </div>
-    );
+    return <div>{ParamsExample()}</div>;
   }
 }

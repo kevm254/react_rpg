@@ -8,7 +8,7 @@ interface Position {
 export default class PlayerStyles {
   static getContainerStyles() {
     return {
-      top: 0,
+      top: "-64px",
       position: "relative",
       height: "64px",
       width: "64px"

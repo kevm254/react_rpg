@@ -23,11 +23,41 @@ export default class Tilemap extends Component {
   getBrightness() {
     return `rgba(0, 0, 0, ${this.props.brightness || 0})`;
   }
+
+  renderBrightnessLayer() {
+    return (
+      <div
+        style={{
+          position: "absolute",
+          height: "64px",
+          width: "64px",
+          backgroundColor: this.getBrightness()
+        }}
+      />
+    );
+  }
+
+  renderObstructionLayer() {
+    return (
+      <div
+        style={{
+          position: "absolute",
+          height: "64px",
+          width: "64px",
+          backgroundColor: `rgba(0, 0, 0, ${
+            this.props.showObsLayer ? 0.5 : 0
+          })`,
+          zIndex: 800
+        }}
+      />
+    );
+  }
+
   render() {
     return (
       <div
         style={{
-          display: this.props.row ? "inline-block" : "block",
+          display: "inline-block",
           height: 64,
           width: 64,
           border: this.props.showBorder ? "1px solid white" : "",
@@ -35,15 +65,11 @@ export default class Tilemap extends Component {
           marginTop: "-4px"
         }}
       >
-        <div
-          style={{
-            position: "absolute",
-            height: "64px",
-            width: "64px",
-            backgroundColor: this.getBrightness()
-          }}
-        />
-        <img src={this.getTile(this.props.tileNo)} />
+        {this.renderObstructionLayer()}
+
+        {this.props.tileNo === 0 ? null : (
+          <img src={this.getTile(this.props.tileNo)} />
+        )}
       </div>
     );
   }

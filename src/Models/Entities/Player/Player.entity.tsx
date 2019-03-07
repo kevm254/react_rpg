@@ -37,6 +37,8 @@ export default class Player extends Component {
     this.playerIsNotRolling = this.playerIsNotRolling.bind(this);
     this.updatePlayerHP = this.updatePlayerHP.bind(this);
     this.closeTextBubble = this.closeTextBubble.bind(this);
+    this.updatePlayerPos = this.updatePlayerPos.bind(this);
+    this.checkForEvent = this.checkForEvent.bind(this);
   }
 
   // END Constructor //////////////////////////////////
@@ -73,14 +75,24 @@ export default class Player extends Component {
     this.openTextBubble();
   }
 
+  checkForEvent() {
+    this.props.checkForEvent();
+  }
+
   updatePlayerHP(hp: number) {
     this.setState({ currentHP: this.state.currentHP + hp });
+  }
+
+  updatePlayerPos(props) {
+    props.updatePlayerPos(this.state.playerPos);
   }
 
   initPlayerPos() {
     this.props.startPos
       ? this.setPlayerPos(this.props.startPos)
       : this.setPlayerPos({ x: 0, y: 0 });
+
+    this.updatePlayerPos(this.props);
   }
 
   setPlayerPos(pos: { x: number; y: number }) {
@@ -196,36 +208,42 @@ export default class Player extends Component {
     }
   }
 
-  rollRight() {
-    this.setState({ isRolled: !this.state.isRolled });
-    this.updatePlayerDirection("RIGHT");
-    this.state.isRolled
-      ? anime({
-          targets: this.innerPlayerRef.current,
-          rotate: [0, 180],
-          easing: "easeOutQuad",
-          duration: 350
-        })
-      : anime({
-          targets: this.innerPlayerRef.current,
-          rotate: [180, 360],
-          easing: "easeOutQuad",
-          duration: 350
-        });
+  moveUp() {
+    if (this.canMove("UP")) {
+      this.setState({
+        playerPos: { ...this.state.playerPos, y: this.state.playerPos.y - 1 }
+      });
+      PlayerAnims.rollUp({
+        targets: this.playerRef.current,
+        playerYPos: this.state.playerPos.y
+      });
+
+      this.updatePlayerPos(this.props);
+      this.checkForEvent();
+    }
   }
 
-  moveRight() {
-    if (this.canMove("RIGHT")) {
+  moveDown() {
+    if (this.canMove("DOWN")) {
       this.setState({
         playerPos: {
           ...this.state.playerPos,
-          x: this.state.playerPos.x + 1
+          y: this.state.playerPos.y + 1
         }
       });
-      PlayerAnims.rollRight({
+
+      anime({
         targets: this.playerRef.current,
-        playerXPos: this.state.playerPos.x
+        translateY: 64 * this.state.playerPos.y,
+        easing: "easeOutCubic",
+        duration: 300,
+        complete: () => {
+          this.setPlayerIsRolling(false);
+        }
       });
+
+      this.updatePlayerPos(this.props);
+      this.checkForEvent();
     }
   }
 
@@ -246,38 +264,28 @@ export default class Player extends Component {
           this.setPlayerIsRolling(false);
         }
       });
+
+      this.updatePlayerPos(this.props);
+      this.checkForEvent();
     }
   }
 
-  moveUp() {
-    if (this.canMove("UP")) {
+  moveRight() {
+    if (this.canMove("RIGHT")) {
       this.setState({
-        playerPos: { ...this.state.playerPos, y: this.state.playerPos.y - 1 }
+        playerPos: {
+          ...this.state.playerPos,
+          x: this.state.playerPos.x + 1
+        }
       });
-      PlayerAnims.rollUp({
+      PlayerAnims.rollRight({
         targets: this.playerRef.current,
-        playerYPos: this.state.playerPos.y
+        playerXPos: this.state.playerPos.x
       });
+
+      this.updatePlayerPos(this.props);
+      this.checkForEvent();
     }
-  }
-
-  rollLeft() {
-    this.setState({ isRolled: !this.state.isRolled });
-    this.updatePlayerDirection("LEFT");
-
-    this.state.isRolled
-      ? anime({
-          targets: this.innerPlayerRef.current,
-          rotate: [360, 180],
-          easing: "easeOutQuad",
-          duration: 350
-        })
-      : anime({
-          targets: this.innerPlayerRef.current,
-          rotate: [180, 0],
-          easing: "easeOutQuad",
-          duration: 350
-        });
   }
 
   rollUp() {
@@ -308,26 +316,6 @@ export default class Player extends Component {
         });
   }
 
-  moveDown() {
-    if (this.canMove("DOWN")) {
-      this.setState({
-        playerPos: {
-          ...this.state.playerPos,
-          y: this.state.playerPos.y + 1
-        }
-      });
-      anime({
-        targets: this.playerRef.current,
-        translateY: 64 * this.state.playerPos.y,
-        easing: "easeOutCubic",
-        duration: 300,
-        complete: () => {
-          this.setPlayerIsRolling(false);
-        }
-      });
-    }
-  }
-
   rollDown() {
     this.setState({ isRolled: !this.state.isRolled });
     this.updatePlayerDirection("DOWN");
@@ -343,6 +331,43 @@ export default class Player extends Component {
           this.rightEyeRef.current,
           this.playerMouthRef.current
         ]);
+  }
+
+  rollLeft() {
+    this.setState({ isRolled: !this.state.isRolled });
+    this.updatePlayerDirection("LEFT");
+
+    this.state.isRolled
+      ? anime({
+          targets: this.innerPlayerRef.current,
+          rotate: [360, 180],
+          easing: "easeOutQuad",
+          duration: 350
+        })
+      : anime({
+          targets: this.innerPlayerRef.current,
+          rotate: [180, 0],
+          easing: "easeOutQuad",
+          duration: 350
+        });
+  }
+
+  rollRight() {
+    this.setState({ isRolled: !this.state.isRolled });
+    this.updatePlayerDirection("RIGHT");
+    this.state.isRolled
+      ? anime({
+          targets: this.innerPlayerRef.current,
+          rotate: [0, 180],
+          easing: "easeOutQuad",
+          duration: 350
+        })
+      : anime({
+          targets: this.innerPlayerRef.current,
+          rotate: [180, 360],
+          easing: "easeOutQuad",
+          duration: 350
+        });
   }
 
   preventScrolling(e) {

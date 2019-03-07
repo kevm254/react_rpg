@@ -11,8 +11,7 @@ export default class TextBubbleStyles {
       zIndex: 100,
       border: "5px solid gray",
       padding: "20px",
-      top: "-90px",
-      overflow: "hidden"
+      top: "-90px"
     };
   }
 
@@ -52,7 +51,8 @@ export default class TextBubbleStyles {
       zIndex: 100,
       textAlign: "center",
       fontSize: "20px",
-      fontFamily: "Arial"
+      fontFamily: "Arial",
+      overflow: "hidden"
     };
   }
 }
