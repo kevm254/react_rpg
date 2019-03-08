@@ -60,6 +60,21 @@ export default class Player extends Component {
         this.playGameOverAnim();
       }
     }
+
+    console.log("PROPS", this.props);
+    if (prevProps.editPlayerPos !== this.props.editPlayerPos) {
+      switch (this.props.editPlayerPos) {
+        case "PLUSX":
+          this.incrementPlayerPosX();
+          break;
+        case "MINUSX":
+          this.decrementPlayerPosX();
+        case "PLUSY":
+          this.incrementPlayerPosY();
+        case "MINUSY":
+          this.decrementPlayerPosY();
+      }
+    }
   }
   // END Life-Cycle Methods //////////////////////////////
 
@@ -97,6 +112,50 @@ export default class Player extends Component {
 
   setPlayerPos(pos: { x: number; y: number }) {
     this.setState({ playerPos: pos });
+  }
+
+  incrementPlayerPosX() {
+    this.setState(
+      {
+        playerPos: { x: this.state.playerPos.x + 1, y: this.state.playerPos.y }
+      },
+      () => {
+        this.updatePlayerPos(this.props);
+      }
+    );
+  }
+
+  decrementPlayerPosX() {
+    this.setState(
+      {
+        playerPos: { x: this.state.playerPos - 1, y: this.state.playerPos.y }
+      },
+      () => {
+        this.updatePlayerPos(this.props);
+      }
+    );
+  }
+
+  incrementPlayerPosY() {
+    this.setState(
+      {
+        playerPos: { x: this.state.playerPos.x, y: this.state.playerPos.y + 1 }
+      },
+      () => {
+        this.updatePlayerPos(this.props);
+      }
+    );
+  }
+
+  decrementPlayerPosY() {
+    this.setState(
+      {
+        playerPos: { x: this.state.playerPos.x, y: this.state.playerPos.y - 1 }
+      },
+      () => {
+        this.updatePlayerPos(this.props);
+      }
+    );
   }
 
   updatePlayerDirection(direction: string) {
@@ -166,7 +225,7 @@ export default class Player extends Component {
   animateFaceOnInit() {
     // PlayerAnims.animateMouth(this.playerMouthRef.current);
     // PlayerAnims.animateLeftPupil( );
-    // PlayerAnims.animateRightPupil();
+    // Playernims.animateRightPupil();
   }
 
   playerIsRolling() {
@@ -183,7 +242,7 @@ export default class Player extends Component {
         return (
           this.props.obstructionMap[this.state.playerPos.y][
             this.state.playerPos.x - 1
-          ] !== 1 && this.state.playerPos.x > 0
+          ] !== 1 && this.state.playerPos.x > this.props.screenEdgeX
         );
       case "RIGHT":
         return (
@@ -257,7 +316,7 @@ export default class Player extends Component {
       });
       anime({
         targets: this.playerRef.current,
-        translateX: 64 * this.state.playerPos.x,
+        translateX: 64 * this.state.playerPos.x - this.props.offsetX,
         easing: "easeOutCubic",
         duration: 300,
         complete: () => {
@@ -280,7 +339,8 @@ export default class Player extends Component {
       });
       PlayerAnims.rollRight({
         targets: this.playerRef.current,
-        playerXPos: this.state.playerPos.x
+        playerXPos: this.state.playerPos.x,
+        offsetX: this.props.offsetX
       });
 
       this.updatePlayerPos(this.props);
@@ -415,7 +475,7 @@ export default class Player extends Component {
     return (
       <div ref={this.playerRef} style={PlayerStyles.getContainerStyles()}>
         {this.displayTextBubble(this.state)}
-
+        <div>{this.props.screenEdgeX}</div>
         <div ref={this.innerPlayerRef} style={PlayerStyles.getBodyStyles()}>
           <img
             src={"./img/player_texture.png"}

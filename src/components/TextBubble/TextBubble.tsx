@@ -35,7 +35,7 @@ export default class TextBubble extends Component {
     TextBubbleAnims.fadeInBody({ targets: this.textBubbleRef.current });
     this.setCurrentText(this.textQueue.pop());
     this.animateWords();
-    this.setState({ displayedText: "what's going on?" });
+    this.setState({ displayedText: "Hello!" });
   }
   // END Life-Cycle Methods ////////////////////////////////
 

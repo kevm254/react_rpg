@@ -29,7 +29,7 @@ export default class DebugState extends Component {
       itemsMatrix: [],
       obstructionsMatrix: [],
       events: [],
-      showObstructions: false,
+      showObstructions: true,
       playerPos: null,
       updatePlayerHP: 0,
       playerHP: { current: 2, max: 2 },
@@ -37,7 +37,11 @@ export default class DebugState extends Component {
       playerTop: 0,
       playerLeft: 0,
       currentEvent: null,
-      inventory: { key: false }
+      inventory: { key: false },
+      editPlayerPos: "",
+      offsetX: 0,
+      screenEdgeX: 0,
+      screenEdgeY: 0
     };
 
     this.bindAll();
@@ -81,8 +85,26 @@ export default class DebugState extends Component {
     });
   }
 
-  componentDidMount() {
-    console.log("component", this.state);
+  shiftScreen() {
+    anime({
+      targets: ".tile_hook",
+      translateX: [0, -640],
+
+      easing: "linear",
+      duration: "2000"
+    });
+    anime({
+      targets: ".player_hook",
+      // opacity: [1, 0],
+      translateX: [0, -576],
+
+      duration: "1800",
+      easing: "linear"
+    });
+
+    this.setState({ screenEdgeX: 10 });
+    this.setState({ editPlayerPos: "PLUSX" });
+    this.setState({ offsetX: 64 });
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -151,6 +173,10 @@ export default class DebugState extends Component {
         });
       }
     }
+
+    if (currEvent.toString() === "3") {
+      this.shiftScreen();
+    }
   }
 
   updateMatrix(matrix, x, y, val) {
@@ -177,7 +203,6 @@ export default class DebugState extends Component {
   }
 
   renderTileRow(dataSource: [], state: any) {
-    console.log("what is state", this.state);
     let tileArray = [];
 
     dataSource.map((row: [], i) => {
@@ -185,10 +210,10 @@ export default class DebugState extends Component {
 
       tileArray.push(
         row.map((item, i) => {
-          console.log("ayyy", this.state.obstructionsMatrix[3][8]);
           return (
             <Tile
               tileNo={item}
+              tilePos={{ x: i, y: currentRow }}
               showBorder={false}
               brightness={this.lightMap[currentRow][i]}
               showObsLayer={
@@ -253,18 +278,24 @@ export default class DebugState extends Component {
     );
   }
 
-  displayPlayer() {
+  displayPlayer(state) {
     return (
-      <Player
-        playerOffset={{ x: 0, y: 0 }}
-        obstructionMap={this.state.obstructionsMatrix}
-        updatePlayerPos={this.updatePlayerPos}
-        checkForDamage={this.checkForDamage}
-        checkForEvent={this.checkForEvent}
-        resetDamage={this.resetDamage}
-        updatePlayerHP={this.state.updatePlayerHP}
-        showGameOver={this.showGameOver}
-      />
+      <div class="player_hook">
+        <Player
+          playerOffset={{ x: 0, y: 0 }}
+          obstructionMap={state.obstructionsMatrix}
+          updatePlayerPos={this.updatePlayerPos}
+          checkForDamage={this.checkForDamage}
+          checkForEvent={this.checkForEvent}
+          resetDamage={this.resetDamage}
+          updatePlayerHP={state.updatePlayerHP}
+          editPlayerPos={state.editPlayerPos}
+          showGameOver={this.showGameOver}
+          offsetX={this.state.offsetX}
+          screenEdgeX={this.state.screenEdgeX}
+          screenEdgeY={this.state.screenEdgeY}
+        />
+      </div>
     );
   }
 
@@ -276,10 +307,14 @@ export default class DebugState extends Component {
     return layers.map((layer, idx) => {
       return (
         <div key={idx} style={{ position: "absolute", top: 0, left: 0 }}>
-          {layer.map(row => {
-            row.push(<br />);
-            return row;
-          })}
+          <div style={{ width: "640px", overflow: "hidden" }}>
+            <div class="tile_hook" style={{ width: "1280px" }}>
+              {layer.map(row => {
+                row.push(<br />);
+                return row;
+              })}
+            </div>
+          </div>
         </div>
       );
     });
@@ -308,7 +343,8 @@ export default class DebugState extends Component {
               this.state.tiles2,
               this.state.items
             ])}
-            {this.displayPlayer()}
+
+            {this.displayPlayer(this.state)}
             {this.renderUI(this.state)}
           </div>
         ) : (

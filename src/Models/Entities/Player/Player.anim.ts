@@ -45,10 +45,10 @@ export default class PlayerAnims {
   }
 
   // move Player
-  static rollRight(data: { targets; playerXPos; onComplete }) {
+  static rollRight(data: { targets; playerXPos; onComplete; offsetX }) {
     return anime({
       targets: data.targets,
-      translateX: 64 * data.playerXPos,
+      translateX: 64 * data.playerXPos - data.offsetX,
       easing: "easeOutQuad",
       duration: 300,
       complete: data.onComplete

@@ -2,6 +2,8 @@ export default class DebugStyles {
   static getGameContainerStyles() {
     return {
       marginTop: "100px",
+      height: "640px",
+      width: "1280px",
       position: "relative"
     };
   }
